@@ -25,7 +25,8 @@ import { UserProfileMenu } from "./UserProfileMenu";
 const appWindow = getCurrentWindow();
 const isMac =
   typeof navigator !== "undefined" &&
-  navigator.platform.toUpperCase().indexOf("MAC") >= 0;
+  (navigator.platform.toUpperCase().indexOf("MAC") >= 0 ||
+    navigator.userAgent.toUpperCase().indexOf("MAC") >= 0);
 
 export default function Titlebar() {
   const [isMaximized, setIsMaximized] = useState(false);

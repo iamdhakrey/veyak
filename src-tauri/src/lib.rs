@@ -85,6 +85,11 @@ pub fn run() {
 
             app_handle.manage::<PkceSessionState>(Arc::new(Mutex::new(None)));
 
+            #[cfg(target_os = "macos")]
+            if let Some(window) = app_handle.get_webview_window("main") {
+                let _ = window.set_decorations(true);
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
