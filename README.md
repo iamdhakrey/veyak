@@ -12,13 +12,15 @@
 
 <p align="center">
   <a href="#-why-samvad">Why Samvad?</a> •
-  <a href="#-key-features">Key Features</a> •
-  <a href="#-tech-stack">Tech Stack</a> •
-  <a href="#-getting-started">Getting Started</a> •
-  <a href="#-contributing">Contributing</a>
+  <a href="https://samvad.iamdhakrey.dev/">Key Features</a> •
+  <a href="https://samvad.iamdhakrey.dev/docs/">Tech Stack</a> •
+  <a href="https://samvad.iamdhakrey.dev/docs/getting-started/">Getting Started</a> •
+  <a href="https://samvad.iamdhakrey.dev/docs/contributing/">Contributing</a> •
+  <a href="https://samvad.iamdhakrey.dev/docs/">Documentation</a>
 </p>
 
 *Samvad (संवाद)* is the Sanskrit/Hindi word for *"dialogue"* or *"meaningful conversation"* - representing seamless, frictionless communication between clients and modern APIs.
+
 <img width="1198" height="830" alt="image" src="https://github.com/user-attachments/assets/f2e6c1d5-4a8f-4d05-a6fc-5000afe164e7" />
 
 ---
