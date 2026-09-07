@@ -213,7 +213,7 @@ export default function Titlebar() {
         {!isMac && (
           <img
             src="/icon.png"
-            alt="Samvad"
+            alt="Veyak"
             className="h-4 w-4 object-contain mr-1.5"
           />
         )}

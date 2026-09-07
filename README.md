@@ -1,6 +1,6 @@
 <div align="center">
 
-# ⚡ Samvad (संवाद)
+# ⚡ Veyak API Client
 
 **The Blazing-Fast, Lightweight, Native Multi-Protocol API Client.**
 
@@ -11,15 +11,15 @@
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 
 <p align="center">
-  <a href="#-why-samvad">Why Samvad?</a> •
-  <a href="https://samvad.iamdhakrey.dev/">Key Features</a> •
-  <a href="https://samvad.iamdhakrey.dev/docs/">Tech Stack</a> •
-  <a href="https://samvad.iamdhakrey.dev/docs/getting-started/">Getting Started</a> •
-  <a href="https://samvad.iamdhakrey.dev/docs/contributing/">Contributing</a> •
-  <a href="https://samvad.iamdhakrey.dev/docs/">Documentation</a>
+  <a href="#-why-veyak">Why Veyak?</a> •
+  <a href="https://veyak.iamdhakrey.dev/">Key Features</a> •
+  <a href="https://veyak.iamdhakrey.dev/docs/">Tech Stack</a> •
+  <a href="https://veyak.iamdhakrey.dev/docs/getting-started/">Getting Started</a> •
+  <a href="https://veyak.iamdhakrey.dev/docs/contributing/">Contributing</a> •
+  <a href="https://veyak.iamdhakrey.dev/docs/">Documentation</a>
 </p>
 
-*Samvad (संवाद)* is the Sanskrit/Hindi word for *"dialogue"* or *"meaningful conversation"* - representing seamless, frictionless communication between clients and modern APIs.
+*Veyak API Client* is engineered for seamless, frictionless communication between clients and modern APIs.
 
 <img width="1198" height="830" alt="image" src="https://github.com/user-attachments/assets/f2e6c1d5-4a8f-4d05-a6fc-5000afe164e7" />
 
@@ -27,13 +27,13 @@
 
 </div>
 
-## Why Samvad?
+## Why Veyak?
 
 Tired of clunky API clients that consume 1 GB+ of RAM, take 10 seconds to open, and force cloud logins just to test a local endpoint? 
 
-**Samvad is engineered differently:**
+**Veyak is engineered differently:**
 
-| Feature | Postman / Insomnia | ⚡ Samvad |
+| Feature | Postman / Insomnia | ⚡ Veyak |
 | :--- | :--- | :--- |
 | **Engine** | Electron (Heavy Chromium bundle) | **Rust + Tauri 2 (Native OS Webview)** |
 | **Memory Footprint** | ~500 MB – 1.2 GB RAM | **< 60 MB RAM** |
@@ -74,7 +74,7 @@ Tired of clunky API clients that consume 1 GB+ of RAM, take 10 seconds to open, 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     SAMVAD ARCHITECTURE                 │
+│                     VEYAK ARCHITECTURE                  │
 ├────────────────────────────┬────────────────────────────┤
 │         FRONTEND           │          BACKEND           │
 │   • React 19               │   • Tauri 2.0 (Rust)       │
@@ -101,8 +101,8 @@ Make sure you have installed:
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/iamdhakrey/samvad.git
-   cd samvad
+   git clone https://github.com/iamdhakrey/veyak.git
+   cd veyak
    ```
 
 2. **Install dependencies**
@@ -143,7 +143,7 @@ Contributions make the open-source community thrive! Any contributions you make 
 
 ## Show Your Support
 
-If you love the idea of a lightning-fast, native, privacy-first API client, please give **Samvad** a **Star (⭐️)**! It helps the project grow and motivates ongoing development.
+If you love the idea of a lightning-fast, native, privacy-first API client, please give **Veyak** a **Star (⭐️)**! It helps the project grow and motivates ongoing development.
 
 ---
 

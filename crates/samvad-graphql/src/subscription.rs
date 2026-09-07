@@ -59,7 +59,7 @@ pub async fn start_subscription(
     // let request = http::Request::builder()
     //     .uri(&ws_url)
     //     .header("Sec-WebSocket-Protocol", "graphql-ws")
-    //     .header("User-Agent", "Samvad/0.1")
+    //     .header("User-Agent", "Veyak/0.1")
     //     .body(())
     //     .map_err(|e| AppError::GraphQlError(format!("Failed to build WS request: {e}")))?;
 
@@ -73,7 +73,7 @@ pub async fn start_subscription(
     );
     request
         .headers_mut()
-        .insert("User-Agent", "Samvad/0.1".parse().unwrap());
+        .insert("User-Agent", "Veyak/0.1".parse().unwrap());
 
     let (ws_stream, _) = connect_async_tls_with_config(request, None, false, None)
         .await

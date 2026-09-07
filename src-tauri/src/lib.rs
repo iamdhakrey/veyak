@@ -172,5 +172,5 @@ pub fn run() {
             fonts::get_system_fonts,
         ])
         .run(tauri::generate_context!())
-        .expect("error while running Samvad application");
+        .expect("error while running Veyak application");
 }

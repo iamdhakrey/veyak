@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Samvad",
+  "productName": "Veyak",
   "version": "0.5.1",
-  "identifier": "com.iamdhakrey.samvad",
+  "identifier": "com.iamdhakrey.veyak",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "Samvad",
+        "title": "Veyak",
         "width": 1200,
         "height": 800,
         "decorations": false,
@@ -46,6 +46,7 @@
     "deep-link": {
       "desktop": {
         "schemes": [
+          "veyak",
           "samvad"
         ]
       }

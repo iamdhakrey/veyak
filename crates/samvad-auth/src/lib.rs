@@ -16,7 +16,7 @@ use samvad_error::{AppError, AppResult};
 
 pub const AUTH0_DOMAIN: &str = "dev-q8fu8sev1deljwdb.us.auth0.com";
 pub const CLIENT_ID: &str = "tMfu0Y4XuUixvOMfkB3xsKm5Wf87ZSQP";
-pub const REDIRECT_URI: &str = "https://samvad.iamdhakrey.dev";
+pub const REDIRECT_URI: &str = "https://veyak.iamdhakrey.dev";
 
 // ── Models ──────────────────────────────────────────────────────────────
 /// Auth0 `/oauth/token` response shape.
