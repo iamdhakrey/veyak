@@ -107,6 +107,55 @@
     .input-shell {
         @apply bg-panel border border-border rounded-md text-sm text-text-primary placeholder:text-text-muted px-3 py-1.5 outline-none focus:border-primary focus:ring-1 focus:ring-primary/40 transition-colors;
     }
+
+    .changelog-content h1,
+    .changelog-content h2,
+    .changelog-content h3 {
+        @apply font-semibold text-text-primary mt-3 mb-1.5 pb-1 border-b border-border/40 text-xs tracking-wide uppercase;
+    }
+
+    .changelog-content h1:first-child,
+    .changelog-content h2:first-child,
+    .changelog-content h3:first-child {
+        @apply mt-0;
+    }
+
+    .changelog-content p {
+        @apply my-1.5 text-xs leading-relaxed text-text-secondary;
+    }
+
+    .changelog-content ul {
+        @apply my-1.5 list-disc pl-4 space-y-1 text-xs text-text-secondary;
+    }
+
+    .changelog-content ol {
+        @apply my-1.5 list-decimal pl-4 space-y-1 text-xs text-text-secondary;
+    }
+
+    .changelog-content li {
+        @apply leading-relaxed;
+    }
+
+    .changelog-content a {
+        @apply text-primary hover:text-primary-hover hover:underline transition-colors font-medium;
+    }
+
+    .changelog-content strong,
+    .changelog-content b {
+        @apply font-semibold text-text-primary;
+    }
+
+    .changelog-content code {
+        @apply rounded bg-panel-raised border border-border px-1 py-0.5 font-mono text-[11px] text-primary;
+    }
+
+    .changelog-content pre {
+        @apply my-2 overflow-x-auto rounded-md border border-border bg-panel-raised p-2.5 font-mono text-[11px] text-text-primary;
+    }
+
+    .changelog-content blockquote {
+        @apply my-2 border-l-2 border-primary/50 pl-2.5 italic text-xs text-text-muted;
+    }
 }
 
 /* ── Mobile utilities ─────────────────────────────────────────────────── */
