@@ -19,6 +19,7 @@
 </p>
 
 *Samvad (संवाद)* is the Sanskrit/Hindi word for *"dialogue"* or *"meaningful conversation"* - representing seamless, frictionless communication between clients and modern APIs.
+<img width="1198" height="830" alt="image" src="https://github.com/user-attachments/assets/f2e6c1d5-4a8f-4d05-a6fc-5000afe164e7" />
 
 ---
 
