@@ -112,7 +112,7 @@ pub async fn ws_connect(
     let connector = build_ws_client(&settings)?;
     let (ws_stream, _response) = if check_is_secure_ws(url.clone()) {
         connect_async_tls_with_config(
-            url.clone(),
+            request,
             None,  // Use default WebSocketConfig
             false, // Do not disable Nagle's algorithm
             Some(connector),
