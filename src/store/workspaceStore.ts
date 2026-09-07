@@ -7,7 +7,7 @@ import {
   EnvironmentVariable,
   EnvironmentWithVariables,
   AdditionType,
-} from "@samvad-internal/models";
+} from "@veyak-internal/models";
 
 export interface WorkspaceStore {
   environments: EnvironmentWithVariables[];

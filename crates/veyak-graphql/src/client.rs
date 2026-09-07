@@ -1,5 +1,5 @@
-use samvad_error::{AppError, AppResult};
-use samvad_models::GraphQlResponse;
+use veyak_error::{AppError, AppResult};
+use veyak_models::GraphQlResponse;
 use std::collections::BTreeMap;
 use std::time::Instant;
 

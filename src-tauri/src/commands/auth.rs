@@ -2,15 +2,15 @@
 // Auth commands — Tauri command wrappers for the auth module
 // ---------------------------------------------------------------------------
 
-use samvad_error::{AppError, AppResult};
-use samvad_models::{AuthState, PkceSession, User};
+use veyak_error::{AppError, AppResult};
+use veyak_models::{AuthState, PkceSession, User};
 use std::sync::Arc;
 use tauri::command;
 use tauri::State;
 use tokio::sync::Mutex;
 
 use crate::state::AppState;
-use samvad_auth as auth_core;
+use veyak_auth as auth_core;
 
 /// Shared in-memory PKCE session for the in-flight login attempt.
 pub type PkceSessionState = Arc<Mutex<Option<PkceSession>>>;

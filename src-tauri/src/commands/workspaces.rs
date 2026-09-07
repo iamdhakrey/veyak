@@ -1,6 +1,6 @@
 use crate::{db, state::AppState};
-use samvad_error::AppResult;
-use samvad_models::{ActiveState, Workspace};
+use veyak_error::AppResult;
+use veyak_models::{ActiveState, Workspace};
 use tauri::State;
 
 #[tauri::command]

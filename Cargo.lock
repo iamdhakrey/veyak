@@ -3995,145 +3995,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "samvad"
-version = "0.5.1"
-dependencies = [
- "base64 0.23.1",
- "chrono",
- "font-kit",
- "futures-util",
- "glib 0.20.12",
- "http",
- "openssl",
- "rand",
- "reqwest",
- "rustls",
- "samvad-auth",
- "samvad-db",
- "samvad-error",
- "samvad-graphql",
- "samvad-grpc",
- "samvad-models",
- "serde",
- "serde_json",
- "serde_yaml",
- "sha2 0.11.0",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-oauth",
- "tauri-plugin-opener",
- "tauri-plugin-process",
- "tauri-plugin-store",
- "tauri-plugin-updater",
- "thiserror 2.0.20",
- "tokio",
- "tokio-tungstenite",
- "tokio-util",
- "url",
- "urlencoding",
- "uuid",
-]
-
-[[package]]
-name = "samvad-auth"
-version = "0.1.0"
-dependencies = [
- "base64 0.23.1",
- "rand",
- "reqwest",
- "samvad-db",
- "samvad-error",
- "samvad-models",
- "serde",
- "serde_json",
- "sha2 0.11.0",
- "url",
- "urlencoding",
-]
-
-[[package]]
-name = "samvad-db"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "samvad-error",
- "samvad-models",
- "serde",
- "serde_yaml",
- "uuid",
-]
-
-[[package]]
-name = "samvad-error"
-version = "0.1.0"
-dependencies = [
- "prost-reflect",
- "serde",
- "serde_json",
- "serde_yaml",
- "thiserror 2.0.20",
- "tokio-tungstenite",
- "tonic",
-]
-
-[[package]]
-name = "samvad-graphql"
-version = "0.1.0"
-dependencies = [
- "chrono",
- "futures-util",
- "http",
- "reqwest",
- "samvad-error",
- "samvad-models",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
- "tokio",
- "tokio-tungstenite",
- "tokio-util",
- "uuid",
-]
-
-[[package]]
-name = "samvad-grpc"
-version = "0.1.0"
-dependencies = [
- "async-recursion",
- "http",
- "hyper-rustls",
- "hyper-util",
- "prost",
- "prost-reflect",
- "protox",
- "rustls",
- "rustls-native-certs",
- "samvad-error",
- "samvad-models",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
- "tokio",
- "tokio-stream",
- "tokio-util",
- "tonic",
- "tonic-reflection",
- "tower",
- "tower-service",
- "ts-rs",
-]
-
-[[package]]
-name = "samvad-models"
-version = "0.1.0"
-dependencies = [
- "reqwest",
- "serde",
- "ts-rs",
-]
-
-[[package]]
 name = "schannel"
 version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5895,6 +5756,145 @@ name = "version_check"
 version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a"
+
+[[package]]
+name = "veyak"
+version = "0.5.1"
+dependencies = [
+ "base64 0.23.1",
+ "chrono",
+ "font-kit",
+ "futures-util",
+ "glib 0.20.12",
+ "http",
+ "openssl",
+ "rand",
+ "reqwest",
+ "rustls",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2 0.11.0",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-oauth",
+ "tauri-plugin-opener",
+ "tauri-plugin-process",
+ "tauri-plugin-store",
+ "tauri-plugin-updater",
+ "thiserror 2.0.20",
+ "tokio",
+ "tokio-tungstenite",
+ "tokio-util",
+ "url",
+ "urlencoding",
+ "uuid",
+ "veyak-auth",
+ "veyak-db",
+ "veyak-error",
+ "veyak-graphql",
+ "veyak-grpc",
+ "veyak-models",
+]
+
+[[package]]
+name = "veyak-auth"
+version = "0.1.0"
+dependencies = [
+ "base64 0.23.1",
+ "rand",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2 0.11.0",
+ "url",
+ "urlencoding",
+ "veyak-db",
+ "veyak-error",
+ "veyak-models",
+]
+
+[[package]]
+name = "veyak-db"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "serde",
+ "serde_yaml",
+ "uuid",
+ "veyak-error",
+ "veyak-models",
+]
+
+[[package]]
+name = "veyak-error"
+version = "0.1.0"
+dependencies = [
+ "prost-reflect",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "thiserror 2.0.20",
+ "tokio-tungstenite",
+ "tonic",
+]
+
+[[package]]
+name = "veyak-graphql"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "futures-util",
+ "http",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+ "tokio",
+ "tokio-tungstenite",
+ "tokio-util",
+ "uuid",
+ "veyak-error",
+ "veyak-models",
+]
+
+[[package]]
+name = "veyak-grpc"
+version = "0.1.0"
+dependencies = [
+ "async-recursion",
+ "http",
+ "hyper-rustls",
+ "hyper-util",
+ "prost",
+ "prost-reflect",
+ "protox",
+ "rustls",
+ "rustls-native-certs",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tonic",
+ "tonic-reflection",
+ "tower",
+ "tower-service",
+ "ts-rs",
+ "veyak-error",
+ "veyak-models",
+]
+
+[[package]]
+name = "veyak-models"
+version = "0.1.0"
+dependencies = [
+ "reqwest",
+ "serde",
+ "ts-rs",
+]
 
 [[package]]
 name = "vswhom"

@@ -12,7 +12,7 @@ import { MethodStyles } from "../../types";
 import { useMobileDetect } from "../../hooks/useMobileDetect";
 import { useVartaStore } from "../../store/vartaStore";
 import { useSettingsStore } from "../../store/settingStore";
-import { HttpMethod } from "@samvad-internal/models";
+import { HttpMethod } from "@veyak-internal/models";
 
 export default function TabStrip() {
   const isMobile = useMobileDetect();
@@ -35,26 +35,24 @@ export default function TabStrip() {
             <div
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`group flex max-w-45 shrink-0 cursor-pointer items-center gap-2 border-r border-border px-3 py-2.5 text-sm ${
-                active
+              className={`group flex max-w-45 shrink-0 cursor-pointer items-center gap-2 border-r border-border px-3 py-2.5 text-sm ${active
                   ? "bg-bg text-text-primary border-t-2 border-t-primary"
                   : "text-text-secondary border-t-2 border-t-transparent hover:bg-panel-raised"
-              }`}
+                }`}
             >
               <span
-                className={`text-[10px] font-semibold ${
-                  (tab.request as any).type === "grpc"
+                className={`text-[10px] font-semibold ${(tab.request as any).type === "grpc"
                     ? "text-method-grpc"
                     : (tab.request as any).type === "graphql"
-                    ? "text-method-graphql"
-                    : MethodStyles[tab.request.method as HttpMethod] || "text-text-muted"
-                }`}
+                      ? "text-method-graphql"
+                      : MethodStyles[tab.request.method as HttpMethod] || "text-text-muted"
+                  }`}
               >
                 {(tab.request as any).type === "grpc"
                   ? "gRPC"
                   : (tab.request as any).type === "graphql"
-                  ? "GQL"
-                  : tab.request.method}
+                    ? "GQL"
+                    : tab.request.method}
               </span>
               <span className="truncate">
                 {tab.request.name}

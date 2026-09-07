@@ -1,8 +1,8 @@
-use samvad_error::AppResult;
+use veyak_error::AppResult;
 use tauri::State;
 
 use crate::state::AppState;
-use samvad_models::{Environment, EnvironmentVariable, EnvironmentWithVariables};
+use veyak_models::{Environment, EnvironmentVariable, EnvironmentWithVariables};
 
 #[tauri::command]
 pub async fn list_environments(

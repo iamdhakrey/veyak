@@ -1,6 +1,6 @@
-use samvad_db::{new_id, read_yaml_vec, write_yaml, DataDir};
-use samvad_error::AppResult;
-use samvad_models::WsSavedMessage;
+use veyak_db::{new_id, read_yaml_vec, write_yaml, DataDir};
+use veyak_error::AppResult;
+use veyak_models::WsSavedMessage;
 
 /// Return all saved message templates for a given request.
 pub fn list_saved_messages(dd: &DataDir, request_id: &str) -> AppResult<Vec<WsSavedMessage>> {

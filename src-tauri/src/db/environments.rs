@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use samvad_db::{new_id, read_yaml_vec, write_yaml, DataDir};
-use samvad_error::AppResult;
-use samvad_models::{Environment, EnvironmentVariable, EnvironmentWithVariables};
+use veyak_db::{new_id, read_yaml_vec, write_yaml, DataDir};
+use veyak_error::AppResult;
+use veyak_models::{Environment, EnvironmentVariable, EnvironmentWithVariables};
 
 pub fn list_environments(
     dd: &DataDir,
@@ -48,7 +48,7 @@ fn find_environment_workspace(dd: &DataDir, environment_id: &str) -> AppResult<S
             }
         }
     }
-    Err(samvad_error::AppError::NotFound(format!(
+    Err(veyak_error::AppError::NotFound(format!(
         "environment '{environment_id}'"
     )))
 }

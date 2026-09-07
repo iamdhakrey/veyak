@@ -1,10 +1,10 @@
 use crate::state::AppState;
-use samvad_error::AppResult;
-use samvad_graphql::{
+use veyak_error::AppResult;
+use veyak_graphql::{
     client::execute_graphql, introspection::fetch_schema, state::GraphQlSubscriptionHandle,
     subscription::start_subscription,
 };
-use samvad_models::{
+use veyak_models::{
     AuthConfig, AuthType, GraphQlRequest, GraphQlResponse, GraphQlSchema, GraphQlSubscriptionEvent,
     KeyValueRow,
 };
@@ -42,7 +42,7 @@ fn apply_auth_headers(auth: &AuthConfig, headers: &mut BTreeMap<String, String>)
         }
         AuthType::ApiKey => {
             if let Some(api_key) = &auth.api_key {
-                use samvad_models::ApiKeyTarget;
+                use veyak_models::ApiKeyTarget;
                 if api_key.add_to == ApiKeyTarget::Header && !api_key.key.is_empty() {
                     headers.insert(api_key.key.clone(), api_key.value.clone());
                 }

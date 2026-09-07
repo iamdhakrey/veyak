@@ -9,9 +9,9 @@ use hyper_util::client::legacy::Client;
 use hyper_util::client::legacy::connect::HttpConnector;
 use prost::Message;
 use prost_reflect::DescriptorPool;
-use samvad_error::AppError;
-use samvad_error::AppResult;
-use samvad_models::{GrpcMethod, GrpcService, GrpcStreamType};
+use veyak_error::AppError;
+use veyak_error::AppResult;
+use veyak_models::{GrpcMethod, GrpcService, GrpcStreamType};
 use std::{collections::BTreeMap, str::FromStr};
 use tokio::sync::mpsc;
 use tokio_stream::StreamExt as _;
@@ -343,7 +343,7 @@ pub fn compile_proto_source(
     name: impl AsRef<std::path::Path>,
     source: impl AsRef<str>,
 ) -> AppResult<DescriptorPool> {
-    let temp_dir = std::env::temp_dir().join("samvad_proto");
+    let temp_dir = std::env::temp_dir().join("veyak_proto");
     std::fs::create_dir_all(&temp_dir)
         .map_err(|e| AppError::GrpcError(format!("Failed to create temp proto dir: {}", e)))?;
 

@@ -1,11 +1,11 @@
 use crate::state::AppState;
-use samvad_error::AppResult;
-use samvad_grpc::client::{
+use veyak_error::AppResult;
+use veyak_grpc::client::{
     descriptor_pool_to_services, find_method_descriptor, invoke_unary, start_grpc_stream,
     StreamEvent,
 };
-use samvad_grpc::manager::GrpcActiveStream;
-use samvad_models::{GrpcRequest, GrpcResponse, GrpcService, GrpcStreamEvent};
+use veyak_grpc::manager::GrpcActiveStream;
+use veyak_models::{GrpcRequest, GrpcResponse, GrpcService, GrpcStreamEvent};
 use std::collections::BTreeMap;
 use std::time::Instant;
 use tauri::{command, AppHandle, Emitter, Manager, State, Window};
@@ -168,7 +168,7 @@ pub async fn grpc_invoke(
 
         let duration_ms = start.elapsed().as_millis();
         let mut resp_metadata = BTreeMap::new();
-        resp_metadata.insert("x-samvad-connection-id".to_string(), connection_id);
+        resp_metadata.insert("x-veyak-connection-id".to_string(), connection_id);
 
         Ok(GrpcResponse {
             status: 0,
@@ -213,7 +213,7 @@ pub async fn grpc_send_message(
         .stream_manager
         .send_message(&connection_id, &message)
         .await
-        .map_err(|e| samvad_error::AppError::GrpcError(e))?;
+        .map_err(|e| veyak_error::AppError::GrpcError(e))?;
 
     let timestamp = chrono::Utc::now().to_rfc3339();
     let _ = app_handle.emit(

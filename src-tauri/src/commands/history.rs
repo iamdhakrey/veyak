@@ -1,6 +1,6 @@
 use crate::state::AppState;
-use samvad_error::AppResult;
-use samvad_models::HistoryEntry;
+use veyak_error::AppResult;
+use veyak_models::HistoryEntry;
 use tauri::State;
 
 #[tauri::command]

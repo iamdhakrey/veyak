@@ -1,7 +1,7 @@
 import { create } from "zustand";
 
 import { invoke } from "@tauri-apps/api/core";
-import { AppSettings, FontSettings } from "@samvad-internal/models";
+import { AppSettings, FontSettings } from "@veyak-internal/models";
 import { convertFileSrc } from '@tauri-apps/api/core';
 
 export const DEFAULT_FONT_SETTINGS: FontSettings = {

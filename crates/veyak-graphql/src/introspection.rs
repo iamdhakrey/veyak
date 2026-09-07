@@ -1,5 +1,5 @@
-use samvad_error::{AppError, AppResult};
-use samvad_models::{GraphQlArg, GraphQlField, GraphQlSchema, GraphQlSchemaType, GraphQlTypeRef};
+use veyak_error::{AppError, AppResult};
+use veyak_models::{GraphQlArg, GraphQlField, GraphQlSchema, GraphQlSchemaType, GraphQlTypeRef};
 use std::collections::BTreeMap;
 
 /// The standard GraphQL introspection query (full schema).
@@ -217,7 +217,7 @@ pub fn parse_introspection(json: serde_json::Value) -> AppResult<GraphQlSchema> 
                             .get("deprecationReason")
                             .and_then(|d| d.as_str())
                             .map(str::to_string);
-                        Some(samvad_models::GraphQlEnumValue {
+                        Some(veyak_models::GraphQlEnumValue {
                             name,
                             description: desc,
                             is_deprecated: deprecated,

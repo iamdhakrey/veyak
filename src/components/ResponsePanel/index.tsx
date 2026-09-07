@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Copy, Download, Code2, AlignLeft, AlertCircle } from "lucide-react";
-import { ApiResponse } from "@samvad-internal/models";
+import { ApiResponse } from "@veyak-internal/models";
 // import { ApiResponse } from "../../types";
 
 type RespTab = "body" | "headers" | "cookies" | "raw";
@@ -90,9 +90,8 @@ export default function ResponsePanel({
     <div className="flex h-full flex-col">
       {/* Metrics bar */}
       <div
-        className={`flex items-center gap-4 border-b border-border bg-panel text-sm ${
-          isMobile ? "flex-wrap gap-2 px-3 py-2" : "px-4 py-2"
-        }`}
+        className={`flex items-center gap-4 border-b border-border bg-panel text-sm ${isMobile ? "flex-wrap gap-2 px-3 py-2" : "px-4 py-2"
+          }`}
       >
         <span className={`font-semibold ${statusColor(response.status)}`}>
           {response.status} {response.statusText}
@@ -130,9 +129,8 @@ export default function ResponsePanel({
 
       {/* Sub tabs — scrollable on mobile */}
       <div
-        className={`flex gap-1 border-b border-border ${
-          isMobile ? "overflow-x-auto scrollbar-hide px-2" : "px-4"
-        }`}
+        className={`flex gap-1 border-b border-border ${isMobile ? "overflow-x-auto scrollbar-hide px-2" : "px-4"
+          }`}
       >
         {TABS.map((t) => (
           <button
@@ -177,7 +175,7 @@ export default function ResponsePanel({
           <p className="text-text-muted">
             {response.cookies && response.cookies.length > 0
               ? // Add map logic here if cookies are structured later
-                JSON.stringify(response.cookies)
+              JSON.stringify(response.cookies)
               : "No cookies were set by this response."}
           </p>
         )}

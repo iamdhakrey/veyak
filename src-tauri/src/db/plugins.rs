@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
 
-use samvad_db::{now_iso, read_yaml_vec, write_yaml, DataDir};
-use samvad_error::{AppError, AppResult};
-use samvad_models::{PluginManifest, PluginRecord};
+use veyak_db::{now_iso, read_yaml_vec, write_yaml, DataDir};
+use veyak_error::{AppError, AppResult};
+use veyak_models::{PluginManifest, PluginRecord};
 
 /// YAML-persisted plugin entry (replaces the old SQL row).
 #[derive(Debug, Clone, Serialize, Deserialize)]

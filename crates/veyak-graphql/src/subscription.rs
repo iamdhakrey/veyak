@@ -1,5 +1,5 @@
 use futures_util::{SinkExt, StreamExt};
-use samvad_error::{AppError, AppResult};
+use veyak_error::{AppError, AppResult};
 use std::collections::BTreeMap;
 use tokio::sync::mpsc;
 use tokio_tungstenite::{

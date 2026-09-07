@@ -74,7 +74,7 @@ pub fn run() {
                 .expect("resolve app data dir");
             std::fs::create_dir_all(&data_dir).expect("create app data dir");
 
-            let data_dir = samvad_db::init_data_dir(&data_dir).expect("initialize data directory");
+            let data_dir = veyak_db::init_data_dir(&data_dir).expect("initialize data directory");
 
             app_handle.manage(AppState {
                 data_dir,

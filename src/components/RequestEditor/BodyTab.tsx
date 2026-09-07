@@ -2,7 +2,7 @@ import { useRef } from "react";
 import Editor from "@monaco-editor/react";
 import { Wand2, Upload, File as FileIcon, X } from "lucide-react";
 import KeyValueTable from "./KeyValueTable";
-import { BodyMode, RequestBody } from "@samvad-internal/models";
+import { BodyMode, RequestBody } from "@veyak-internal/models";
 import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "../../store/settingStore";
 
 const MODES: { id: BodyMode; label: string }[] = [
@@ -69,11 +69,10 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
             <button
               key={m.id}
               onClick={() => setMode(m.id)}
-              className={`shrink-0 rounded-md px-2.5 py-1 text-sm ${
-                body.mode === m.id
+              className={`shrink-0 rounded-md px-2.5 py-1 text-sm ${body.mode === m.id
                   ? "bg-panel-raised text-text-primary"
                   : "text-text-secondary hover:bg-panel-raised"
-              }`}
+                }`}
             >
               {m.label}
             </button>
@@ -146,9 +145,8 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
               addFiles(e.dataTransfer.files);
             }}
             onClick={() => fileInputRef.current?.click()}
-            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-center hover:border-primary/60 ${
-              isMobile ? "py-6" : "py-10"
-            }`}
+            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-center hover:border-primary/60 ${isMobile ? "py-6" : "py-10"
+              }`}
           >
             <Upload size={20} className="text-text-secondary" />
             <p className="text-sm text-text-secondary">

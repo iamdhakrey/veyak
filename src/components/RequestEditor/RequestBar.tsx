@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useVartaStore } from "../../store/vartaStore";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { MethodStyles } from "../../types";
-import { HttpMethod } from "@samvad-internal/models";
+import { HttpMethod } from "@veyak-internal/models";
 
 interface UrlInputProps {
   url: string;
@@ -199,9 +199,8 @@ export const UrlAutocompleteInput: React.FC<UrlInputProps> = ({
               <button
                 key={v.id}
                 onClick={() => insertSuggestion(v.key)}
-                className={`flex w-full flex-col px-3 py-1.5 text-left rounded-sm cursor-pointer transition-colors ${
-                  index === selectedIndex ? "bg-primary/20" : "hover:bg-panel"
-                }`}
+                className={`flex w-full flex-col px-3 py-1.5 text-left rounded-sm cursor-pointer transition-colors ${index === selectedIndex ? "bg-primary/20" : "hover:bg-panel"
+                  }`}
               >
                 <span className="text-sm font-mono text-success">{v.key}</span>
                 <span className="text-xs text-text-muted truncate">

@@ -5,7 +5,7 @@ use hyper_util::rt::TokioExecutor;
 use rustls::client::danger::{HandshakeSignatureValid, ServerCertVerified, ServerCertVerifier};
 use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
 use rustls::{ClientConfig, DigitallySignedStruct, RootCertStore, SignatureScheme};
-use samvad_error::AppResult;
+use veyak_error::AppResult;
 use std::sync::Arc;
 use tonic::body::Body;
 

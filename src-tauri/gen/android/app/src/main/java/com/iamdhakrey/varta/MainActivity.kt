@@ -1,4 +1,4 @@
-package com.iamdhakrey.samvad
+package com.iamdhakrey.veyak
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge

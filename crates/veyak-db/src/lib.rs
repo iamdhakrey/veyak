@@ -1,7 +1,7 @@
 use std::path::{Path, PathBuf};
 
-use samvad_error::AppResult;
-use samvad_models::{
+use veyak_error::AppResult;
+use veyak_models::{
     ActiveState, AppSettings, HttpMethod, RequestItem, Theme, ThemeTokens, Workspace,
 };
 use serde::{Serialize, de::DeserializeOwned};
@@ -241,7 +241,7 @@ pub fn new_id() -> String {
 /// with a `ws://` or `wss://` URL to `method: WS`. Runs once (uses a
 /// marker file to avoid re-scanning on every startup).
 fn migrate_ws_method(dd: &DataDir) {
-    use samvad_models::ApiRequest;
+    use veyak_models::ApiRequest;
 
     let marker = dd.root().join(".migration_ws_method_done");
     if marker.exists() {
@@ -306,7 +306,7 @@ fn migrate_ws_method(dd: &DataDir) {
 }
 
 fn migrate_request_http_type(dd: &DataDir) {
-    use samvad_models::ApiRequest;
+    use veyak_models::ApiRequest;
 
     let marker = dd.root().join(".migration_request_type_done");
     if marker.exists() {

@@ -4,7 +4,7 @@
 
 **The Blazing-Fast, Lightweight, Native Multi-Protocol API Client.**
 
-[![GitHub Stars](https://img.shields.io/github/stars/iamdhakrey/samvad?style=for-the-badge&logo=github&color=FACC15)](https://github.com/iamdhakrey/samvad/stargazers)
+[![GitHub Stars](https://img.shields.io/github/stars/iamdhakrey/veyak?style=for-the-badge&logo=github&color=FACC15)](https://github.com/iamdhakrey/veyak/stargazers)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 [![Tauri 2](https://img.shields.io/badge/Tauri-2.0-24C8D8?style=for-the-badge&logo=tauri&logoColor=white)](https://tauri.app/)
 [![Rust](https://img.shields.io/badge/Rust-Backend-DEA584?style=for-the-badge&logo=rust&logoColor=white)](https://www.rust-lang.org/)

@@ -29,7 +29,7 @@ pub enum Error {
     Io(#[from] io::Error),
 
     #[error(transparent)]
-    App(#[from] samvad_error::AppError),
+    App(#[from] veyak_error::AppError),
 
     #[error("Reflection error: {0}")]
     Reflection(String),

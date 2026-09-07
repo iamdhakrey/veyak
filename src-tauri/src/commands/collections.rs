@@ -1,8 +1,8 @@
-use samvad_error::AppResult;
+use veyak_error::AppResult;
 use tauri::State;
 
 use crate::state::AppState;
-use samvad_models::{AdditionType, ApiRequest, Collection, CollectionTree, Folder, RequestItem};
+use veyak_models::{AdditionType, ApiRequest, Collection, CollectionTree, Folder, RequestItem};
 
 #[tauri::command]
 pub async fn get_addition_types() -> AppResult<Vec<AdditionType>> {
