@@ -25,7 +25,7 @@ export default function Sidebar({ isMobile, onClose }: SidebarProps) {
       {isMobile && (
         <div className="flex items-center justify-between border-b border-border px-3 py-2.5">
           <span className="text-sm font-semibold bg-brand-gradient bg-clip-text text-transparent">
-            Samvad
+            Veyak
           </span>
           <button
             onClick={onClose}

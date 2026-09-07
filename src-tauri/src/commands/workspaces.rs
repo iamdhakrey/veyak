@@ -1,7 +1,7 @@
 use crate::{db, state::AppState};
-use samvad_error::AppResult;
-use samvad_models::{ActiveState, Workspace};
 use tauri::State;
+use veyak_error::AppResult;
+use veyak_models::{ActiveState, Workspace};
 
 #[tauri::command]
 pub async fn list_workspaces(state: State<'_, AppState>) -> AppResult<Vec<Workspace>> {

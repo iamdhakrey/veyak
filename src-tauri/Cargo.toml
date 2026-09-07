@@ -1,5 +1,5 @@
 [package]
-name = "samvad"
+name = "veyak"
 version = "0.5.1"
 description = "A Tauri App"
 authors = ["Hrithik Dhakrey <dhakreyhrithik@gmail.com>"]
@@ -11,19 +11,19 @@ edition = "2021"
 # The `_lib` suffix may seem redundant but it is necessary
 # to make the lib name unique and wouldn't conflict with the bin name.
 # This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
-name = "samvad_lib"
+name = "veyak_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
-samvad-models = {path= "../crates/samvad-models"}
-samvad-error = {path= "../crates/samvad-error"}
-samvad-db = {path= "../crates/samvad-db"}
-samvad-auth = {path= "../crates/samvad-auth"}
-samvad-grpc = {path= "../crates/samvad-grpc"}
-samvad-graphql = {path= "../crates/samvad-graphql"}
+veyak-models = {path= "../crates/veyak-models"}
+veyak-error = {path= "../crates/veyak-error"}
+veyak-db = {path= "../crates/veyak-db"}
+veyak-auth = {path= "../crates/veyak-auth"}
+veyak-grpc = {path= "../crates/veyak-grpc"}
+veyak-graphql = {path= "../crates/veyak-graphql"}
 tauri = { version = "2", features = ["macos-private-api"] }
 tauri-plugin-opener = "2"
 tauri-plugin-oauth = "2"

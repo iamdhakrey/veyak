@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Samvad",
+  "productName": "Veyak",
   "version": "0.5.1",
-  "identifier": "com.iamdhakrey.samvad",
+  "identifier": "com.iamdhakrey.veyak",
   "build": {
     "beforeDevCommand": "bun run dev",
     "devUrl": "http://localhost:1420",
@@ -13,7 +13,7 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "Samvad",
+        "title": "Veyak",
         "width": 1200,
         "height": 800,
         "decorations": false,
@@ -39,14 +39,15 @@
   "plugins": {
     "updater": {
       "endpoints": [
-        "https://github.com/iamdhakrey/samvad/releases/latest/download/latest.json"
+        "https://github.com/iamdhakrey/veyak/releases/latest/download/latest.json"
       ],
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEUxRkRFQkUyQTM4OTBFODkKUldTSkRvbWo0dXY5NGNLVEhMZkN3U0p6VVpNNE5xRlhteklrNzJvYWFPMEdwVTBpR09oOVM3Y0cK"
     },
     "deep-link": {
       "desktop": {
         "schemes": [
-          "samvad"
+          "veyak",
+          "veyak"
         ]
       }
     }

@@ -8,8 +8,8 @@ use tokio_tungstenite::{connect_async_tls_with_config, Connector};
 
 use crate::db;
 use crate::state::AppState;
-use samvad_error::{AppError, AppResult};
-use samvad_models::{AppSettings, WsEvent, WsSavedMessage};
+use veyak_error::{AppError, AppResult};
+use veyak_models::{AppSettings, WsEvent, WsSavedMessage};
 
 use rustls::client::danger::{HandshakeSignatureValid, ServerCertVerifier};
 use rustls::pki_types::{CertificateDer, ServerName, UnixTime};
@@ -127,7 +127,7 @@ pub async fn ws_connect(
 
     let (mut write, mut read) = ws_stream.split();
 
-    let connection_id = samvad_db::new_id();
+    let connection_id = veyak_db::new_id();
     let cid = connection_id.clone();
 
     // Create an mpsc channel: the `ws_send` command writes to `tx`,
@@ -163,7 +163,7 @@ pub async fn ws_connect(
                                     connection_id: cid_for_task.clone(),
                                     direction: "closed".to_string(),
                                     data: String::new(),
-                                    timestamp: samvad_db::now_iso(),
+                                    timestamp: veyak_db::now_iso(),
                                 });
                                 break;
                             }
@@ -175,7 +175,7 @@ pub async fn ws_connect(
                                     connection_id: cid_for_task.clone(),
                                     direction: "received".to_string(),
                                     data,
-                                    timestamp: samvad_db::now_iso(),
+                                    timestamp: veyak_db::now_iso(),
                                 });
                             }
                         }
@@ -233,7 +233,7 @@ pub async fn ws_send(
             connection_id,
             direction: "sent".to_string(),
             data: message,
-            timestamp: samvad_db::now_iso(),
+            timestamp: veyak_db::now_iso(),
         },
     );
 

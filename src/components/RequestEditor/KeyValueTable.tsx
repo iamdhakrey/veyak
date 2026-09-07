@@ -1,4 +1,4 @@
-import { KeyValueRow } from "@samvad-internal/models";
+import { KeyValueRow } from "@veyak-internal/models";
 import { Plus, Trash2 } from "lucide-react";
 
 const COMMON_HEADERS = [

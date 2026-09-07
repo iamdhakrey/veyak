@@ -11,7 +11,7 @@ import {
 import { useVartaStore } from "../store/vartaStore";
 import { useSettingsStore } from "../store/settingStore";
 import { useWorkspaceStore } from "../store/workspaceStore";
-import { RequestItem } from "@samvad-internal/models";
+import { RequestItem } from "@veyak-internal/models";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -211,16 +211,14 @@ export default function CommandPalette({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-start justify-center bg-black/55 backdrop-blur-sm animate-in fade-in duration-150 ${
-        isMobile ? "pt-[5vh]" : "pt-[13vh]"
-      }`}
+      className={`fixed inset-0 z-50 flex items-start justify-center bg-black/55 backdrop-blur-sm animate-in fade-in duration-150 ${isMobile ? "pt-[5vh]" : "pt-[13vh]"
+        }`}
       onClick={() => toggle(false)}
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`overflow-hidden rounded-xl border border-border bg-panel shadow-elevated animate-in zoom-in-95 duration-150 ${
-          isMobile ? "w-[95vw]" : "w-140"
-        }`}
+        className={`overflow-hidden rounded-xl border border-border bg-panel shadow-elevated animate-in zoom-in-95 duration-150 ${isMobile ? "w-[95vw]" : "w-140"
+          }`}
       >
         {/* Search input */}
         <div className="flex items-center gap-2.5 border-b border-border px-3.5 py-3">
@@ -321,11 +319,10 @@ function Group({
             key={item.id}
             data-idx={idx}
             onClick={() => onSelect(item)}
-            className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-left transition-colors ${
-              isSelected
+            className={`flex w-full items-center gap-2.5 px-3.5 py-2 text-left transition-colors ${isSelected
                 ? "bg-primary/15 text-text-primary"
                 : "text-text-secondary hover:bg-panel-raised hover:text-text-primary"
-            }`}
+              }`}
           >
             {/* Icon */}
             <span
@@ -351,9 +348,8 @@ function Group({
             <span className="shrink-0 flex items-center gap-2">
               {item.method && (
                 <span
-                  className={`font-mono text-[10px] font-bold ${
-                    METHOD_COLORS[item.method] ?? "text-text-muted"
-                  }`}
+                  className={`font-mono text-[10px] font-bold ${METHOD_COLORS[item.method] ?? "text-text-muted"
+                    }`}
                 >
                   {item.method}
                 </span>

@@ -1,4 +1,4 @@
-import { AuthConfig, AuthType } from "@samvad-internal/models";
+import { AuthConfig, AuthType } from "@veyak-internal/models";
 
 const AUTH_TYPES: { id: AuthType; label: string }[] = [
   { id: "none", label: "No auth" },
@@ -16,9 +16,8 @@ interface Props {
 export default function AuthTab({ auth, onChange, isMobile = false }: Props) {
   return (
     <div
-      className={`${
-        isMobile ? "flex flex-col gap-4 px-3 py-3" : "flex gap-6 px-4 py-4"
-      }`}
+      className={`${isMobile ? "flex flex-col gap-4 px-3 py-3" : "flex gap-6 px-4 py-4"
+        }`}
     >
       {/* Auth type selector */}
       <div
@@ -32,15 +31,13 @@ export default function AuthTab({ auth, onChange, isMobile = false }: Props) {
           <button
             key={t.id}
             onClick={() => onChange({ ...auth, type: t.id })}
-            className={`${
-              isMobile
+            className={`${isMobile
                 ? "shrink-0 rounded-md px-3 py-1.5"
                 : "block w-full rounded-md px-2.5 py-1.5"
-            } text-left text-sm ${
-              auth.type === t.id
+              } text-left text-sm ${auth.type === t.id
                 ? "bg-panel-raised text-text-primary"
                 : "text-text-secondary hover:bg-panel-raised"
-            }`}
+              }`}
           >
             {t.label}
           </button>

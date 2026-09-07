@@ -1,6 +1,6 @@
-use samvad_db::{new_id, now_iso, read_yaml_vec, write_yaml, DataDir};
-use samvad_error::AppResult;
-use samvad_models::{HistoryEntry, HttpMethod};
+use veyak_db::{new_id, now_iso, read_yaml_vec, write_yaml, DataDir};
+use veyak_error::AppResult;
+use veyak_models::{HistoryEntry, HttpMethod};
 
 pub fn add_entry(
     dd: &DataDir,

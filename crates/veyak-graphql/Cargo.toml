@@ -1,5 +1,5 @@
 [package]
-name = "samvad-graphql"
+name = "veyak-graphql"
 version = "0.1.0"
 edition = "2021"
 
@@ -15,5 +15,5 @@ chrono = "0.4.45"
 tokio-util = { version = "0.7.19", features = ["rt"] }
 thiserror = "2.0.20"
 http = "1.5.0"
-samvad-error = { path = "../samvad-error" }
-samvad-models = { path = "../samvad-models" }
+veyak-error = { path = "../veyak-error" }
+veyak-models = { path = "../veyak-models" }

@@ -1,5 +1,5 @@
 {
-  "name": "@samvad-internal/models",
+  "name": "@veyak-internal/models",
   "version": "1.0.0",
   "private": true,
   "main": "entry/index.ts",

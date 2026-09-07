@@ -6,7 +6,7 @@ import {
   HttpMethod,
   RequestItem,
   UploadedFile,
-} from "@samvad-internal/models";
+} from "@veyak-internal/models";
 
 export const HttpClient: React.FC = () => {
   const [url, setUrl] = useState<string>("https://httpbin.org/post");

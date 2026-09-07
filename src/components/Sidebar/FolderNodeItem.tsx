@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { FolderNode as FolderNodeType } from "@samvad-internal/models";
+import { FolderNode as FolderNodeType } from "@veyak-internal/models";
 import { RequestItem } from "./RequestItem";
 import {
   ChevronRight,

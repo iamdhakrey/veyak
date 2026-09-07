@@ -5,18 +5,18 @@
 // ---------------------------------------------------------------------------
 
 use rand::RngExt;
-use samvad_models::{AuthState, AuthTokens, User};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
+use veyak_models::{AuthState, AuthTokens, User};
 
-use samvad_db::{DataDir, read_yaml_or_default, write_yaml};
-use samvad_error::{AppError, AppResult};
+use veyak_db::{DataDir, read_yaml_or_default, write_yaml};
+use veyak_error::{AppError, AppResult};
 
 // ── Configuration ───────────────────────────────────────────────────────
 
 pub const AUTH0_DOMAIN: &str = "dev-q8fu8sev1deljwdb.us.auth0.com";
 pub const CLIENT_ID: &str = "tMfu0Y4XuUixvOMfkB3xsKm5Wf87ZSQP";
-pub const REDIRECT_URI: &str = "https://samvad.iamdhakrey.dev";
+pub const REDIRECT_URI: &str = "https://veyak.iamdhakrey.dev";
 
 // ── Models ──────────────────────────────────────────────────────────────
 /// Auth0 `/oauth/token` response shape.

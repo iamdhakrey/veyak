@@ -8,7 +8,7 @@ import {
   RequestItem,
   UploadedFile,
   WsSavedMessage,
-} from "@samvad-internal/models";
+} from "@veyak-internal/models";
 
 export type { Collection };
 

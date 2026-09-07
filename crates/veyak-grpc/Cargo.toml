@@ -1,5 +1,5 @@
 [package]
-name = "samvad-grpc"
+name = "veyak-grpc"
 version = "0.1.0"
 edition = "2024"
 
@@ -14,7 +14,7 @@ serde_json = { workspace = true }
 http = "1.5.0"
 tonic-reflection = "0.14.6"
 tokio-stream = { version = "0.1.19", features = ["sync"] }
-samvad-error = {path= "../samvad-error"}
+veyak-error = {path= "../veyak-error"}
 hyper-util = "0.1.20"
 hyper-rustls = "0.27.9"
 rustls = "0.23.43"
@@ -22,7 +22,7 @@ rustls-native-certs = "0.8.4"
 async-recursion = "1.1.1"
 serde.workspace = true
 thiserror = "2.0.20"
-samvad-models = { version = "0.1.0", path = "../samvad-models" }
+veyak-models = { version = "0.1.0", path = "../veyak-models" }
 tower = "0.5.3"
 tower-service = "0.3.3"
 tokio-util = "0.7.19"

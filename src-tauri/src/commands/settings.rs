@@ -1,6 +1,6 @@
-use samvad_error::AppResult;
-use samvad_models::AppSettings;
 use tauri::State;
+use veyak_error::AppResult;
+use veyak_models::AppSettings;
 
 use crate::state::AppState;
 

@@ -21,7 +21,7 @@ import {
   HistoryEntry,
   RequestItem,
   WsSavedMessage,
-} from "@samvad-internal/models";
+} from "@veyak-internal/models";
 
 interface VartaState {
   tabs: RequestTab[];
@@ -783,7 +783,7 @@ export const useVartaStore = create<VartaState>((set, get) => ({
       const response = await invoke<any>("grpc_invoke", { request });
 
       if (isStreaming) {
-        const connectionId = response.metadata?.["x-samvad-connection-id"];
+        const connectionId = response.metadata?.["x-veyak-connection-id"];
         set({
           grpcConnectionId: connectionId || null,
           grpcCallStatus: "streaming",
@@ -1073,9 +1073,9 @@ export const useVartaStore = create<VartaState>((set, get) => ({
         activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
         ...(id === s.activeTabId
           ? {
-              graphqlCallStatus: "sending",
-              graphqlResponse: null,
-            }
+            graphqlCallStatus: "sending",
+            graphqlResponse: null,
+          }
           : {}),
       };
     });
@@ -1088,10 +1088,10 @@ export const useVartaStore = create<VartaState>((set, get) => ({
         const nextTabs = s.tabs.map((t) =>
           t.id === id
             ? {
-                ...t,
-                graphqlCallStatus: (response.errors ? "error" : "ok") as GraphQlCallStatus,
-                graphqlResponse: response,
-              }
+              ...t,
+              graphqlCallStatus: (response.errors ? "error" : "ok") as GraphQlCallStatus,
+              graphqlResponse: response,
+            }
             : t
         );
         return {
@@ -1099,9 +1099,9 @@ export const useVartaStore = create<VartaState>((set, get) => ({
           activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
           ...(id === s.activeTabId
             ? {
-                graphqlCallStatus: (response.errors ? "error" : "ok") as GraphQlCallStatus,
-                graphqlResponse: response,
-              }
+              graphqlCallStatus: (response.errors ? "error" : "ok") as GraphQlCallStatus,
+              graphqlResponse: response,
+            }
             : {}),
         };
       });
@@ -1126,9 +1126,9 @@ export const useVartaStore = create<VartaState>((set, get) => ({
           activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
           ...(id === s.activeTabId
             ? {
-                graphqlCallStatus: "error",
-                graphqlResponse: errResp,
-              }
+              graphqlCallStatus: "error",
+              graphqlResponse: errResp,
+            }
             : {}),
         };
       });
@@ -1159,11 +1159,11 @@ export const useVartaStore = create<VartaState>((set, get) => ({
       const nextTabs = s.tabs.map((t) =>
         t.id === id
           ? {
-              ...t,
-              graphqlCallStatus: "streaming" as const,
-              graphqlSubscriptionMessages: [],
-              graphqlConnectionId: reqId,
-            }
+            ...t,
+            graphqlCallStatus: "streaming" as const,
+            graphqlSubscriptionMessages: [],
+            graphqlConnectionId: reqId,
+          }
           : t
       );
       return {
@@ -1171,10 +1171,10 @@ export const useVartaStore = create<VartaState>((set, get) => ({
         activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
         ...(id === s.activeTabId
           ? {
-              graphqlCallStatus: "streaming",
-              graphqlSubscriptionMessages: [],
-              graphqlConnectionId: reqId,
-            }
+            graphqlCallStatus: "streaming",
+            graphqlSubscriptionMessages: [],
+            graphqlConnectionId: reqId,
+          }
           : {}),
       };
     });
@@ -1196,8 +1196,8 @@ export const useVartaStore = create<VartaState>((set, get) => ({
           activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
           ...(id === s.activeTabId
             ? {
-                graphqlConnectionId: connectionId || reqId,
-              }
+              graphqlConnectionId: connectionId || reqId,
+            }
             : {}),
         };
       });
@@ -1214,9 +1214,9 @@ export const useVartaStore = create<VartaState>((set, get) => ({
           activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
           ...(id === s.activeTabId
             ? {
-                graphqlCallStatus: "error",
-                graphqlConnectionId: null,
-              }
+              graphqlCallStatus: "error",
+              graphqlConnectionId: null,
+            }
             : {}),
         };
       });
@@ -1247,9 +1247,9 @@ export const useVartaStore = create<VartaState>((set, get) => ({
         activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
         ...(id === s.activeTabId
           ? {
-              graphqlCallStatus: "cancelled",
-              graphqlConnectionId: null,
-            }
+            graphqlCallStatus: "cancelled",
+            graphqlConnectionId: null,
+          }
           : {}),
       };
     });
@@ -1263,8 +1263,8 @@ export const useVartaStore = create<VartaState>((set, get) => ({
           activeTab: nextTabs.find((t) => t.id === s.activeTabId) || null,
           ...(id === s.activeTabId
             ? {
-                graphqlCallStatus: "idle",
-              }
+              graphqlCallStatus: "idle",
+            }
             : {}),
         };
       });

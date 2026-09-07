@@ -1,11 +1,11 @@
 use crate::client::{compile_proto_files, get_descriptor_pool_from_reflection, reflect_services};
 use crate::manager::GrpcStreamManager;
 use prost_reflect::DescriptorPool;
-use samvad_error::AppResult;
-use samvad_models::GrpcService;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use veyak_error::AppResult;
+use veyak_models::GrpcService;
 
 /// Managed state for gRPC in Tauri.
 /// Caches DescriptorPools to prevent re-compiling AST / re-querying reflection on every request.

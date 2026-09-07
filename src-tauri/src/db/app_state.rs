@@ -1,6 +1,6 @@
-use samvad_db::{read_yaml_or_default, write_yaml, DataDir};
-use samvad_error::AppResult;
-use samvad_models::ActiveState;
+use veyak_db::{read_yaml_or_default, write_yaml, DataDir};
+use veyak_error::AppResult;
+use veyak_models::ActiveState;
 
 pub fn get_active_state(dd: &DataDir) -> AppResult<ActiveState> {
     read_yaml_or_default(&dd.app_state_path())

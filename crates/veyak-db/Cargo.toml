@@ -1,5 +1,5 @@
 [package]
-name = "samvad-db"
+name = "veyak-db"
 version = "0.1.0"
 edition = "2024"
 
@@ -8,5 +8,5 @@ chrono = "0.4.45"
 serde = { version = "1.0.229", features = ["derive"] }
 serde_yaml = "0.9.34"
 uuid = { version = "1.24.1", features = ["v4"] }
-samvad-models = {path= "../samvad-models"}
-samvad-error = {path= "../samvad-error"}
+veyak-models = {path= "../veyak-models"}
+veyak-error = {path= "../veyak-error"}

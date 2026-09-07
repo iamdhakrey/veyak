@@ -1,4 +1,4 @@
-import { ApiResponse, RequestItem } from "@samvad-internal/models";
+import { ApiResponse, RequestItem } from "@veyak-internal/models";
 import { invoke } from "@tauri-apps/api/core";
 
 export async function sendNativeRequest(

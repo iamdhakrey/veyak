@@ -3447,7 +3447,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "samvad"
+name = "veyak"
 version = "0.3.2"
 dependencies = [
  "base64 0.23.1",

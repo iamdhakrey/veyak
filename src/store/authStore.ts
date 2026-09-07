@@ -1,4 +1,4 @@
-import { AuthTokens, User } from "@samvad-internal/models";
+import { AuthTokens, User } from "@veyak-internal/models";
 import { create } from "zustand";
 
 interface AuthState {

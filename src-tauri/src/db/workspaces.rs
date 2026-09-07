@@ -1,6 +1,6 @@
-use samvad_db::{new_id, now_iso, read_yaml, write_yaml, DataDir};
-use samvad_error::AppResult;
-use samvad_models::Workspace;
+use veyak_db::{new_id, now_iso, read_yaml, write_yaml, DataDir};
+use veyak_error::AppResult;
+use veyak_models::Workspace;
 
 pub fn list_workspaces(dd: &DataDir) -> AppResult<Vec<Workspace>> {
     let ws_dir = dd.workspaces_dir();

@@ -80,12 +80,12 @@ export function UpdaterOverlay() {
             </div>
             <div>
               <h3 className="text-sm font-semibold text-text-primary">
-                {isUpdating ? "Updating Samvad..." : "Update Available"}
+                {isUpdating ? "Updating Veyak..." : "Update Available"}
               </h3>
               <p className="text-[11px] text-text-secondary">
                 {isUpdating
                   ? "Downloading and preparing latest version"
-                  : "A new version of Samvad is ready to install"}
+                  : "A new version of Veyak is ready to install"}
               </p>
             </div>
           </div>
@@ -183,7 +183,7 @@ export function UpdaterOverlay() {
                 <span className="flex items-center gap-1.5 font-medium text-text-primary">
                   <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
                   {progress >= 100
-                    ? "Download complete. Restarting Samvad..."
+                    ? "Download complete. Restarting Veyak..."
                     : "Downloading update package..."}
                 </span>
                 <span className="font-mono text-xs font-bold text-primary">

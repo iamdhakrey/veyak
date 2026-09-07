@@ -4,9 +4,9 @@ use std::sync::Arc;
 use tokio::sync::{mpsc, Mutex};
 use tokio_tungstenite::tungstenite::Message;
 
-use samvad_db::DataDir;
-use samvad_graphql::state::GraphQlState;
-use samvad_grpc::state::GrpcState;
+use veyak_db::DataDir;
+use veyak_graphql::state::GraphQlState;
+use veyak_grpc::state::GrpcState;
 
 /// In-memory map of active WebSocket connections, keyed by connection id.
 pub type WsTx = mpsc::UnboundedSender<Message>;

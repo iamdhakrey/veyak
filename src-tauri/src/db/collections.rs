@@ -1,8 +1,8 @@
 use std::collections::HashMap;
 
-use samvad_db::{new_id, read_yaml, write_yaml, DataDir};
-use samvad_error::{AppError, AppResult};
-use samvad_models::{
+use veyak_db::{new_id, read_yaml, write_yaml, DataDir};
+use veyak_error::{AppError, AppResult};
+use veyak_models::{
     ApiRequest, AuthConfig, Collection, CollectionTree, Folder, FolderNode, GraphQlRequest,
     GraphQlRequestType, GrpcMethodType, GrpcRequest, HttpMethod, RequestBody, RequestItem,
 };

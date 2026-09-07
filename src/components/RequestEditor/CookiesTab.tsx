@@ -1,4 +1,4 @@
-import { CookieRow } from "@samvad-internal/models";
+import { CookieRow } from "@veyak-internal/models";
 import { Plus, Trash2 } from "lucide-react";
 
 interface Props {
