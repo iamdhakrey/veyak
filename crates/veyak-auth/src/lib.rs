@@ -5,9 +5,9 @@
 // ---------------------------------------------------------------------------
 
 use rand::RngExt;
-use veyak_models::{AuthState, AuthTokens, User};
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
+use veyak_models::{AuthState, AuthTokens, User};
 
 use veyak_db::{DataDir, read_yaml_or_default, write_yaml};
 use veyak_error::{AppError, AppResult};

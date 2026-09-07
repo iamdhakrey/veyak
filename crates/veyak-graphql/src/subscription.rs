@@ -1,5 +1,4 @@
 use futures_util::{SinkExt, StreamExt};
-use veyak_error::{AppError, AppResult};
 use std::collections::BTreeMap;
 use tokio::sync::mpsc;
 use tokio_tungstenite::{
@@ -8,6 +7,7 @@ use tokio_tungstenite::{
 };
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
+use veyak_error::{AppError, AppResult};
 
 /// Event sent from the subscription read loop to the Tauri command layer.
 #[derive(Debug, Clone)]

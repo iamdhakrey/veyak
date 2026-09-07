@@ -1,10 +1,10 @@
 use std::path::{Path, PathBuf};
 
+use serde::{Serialize, de::DeserializeOwned};
 use veyak_error::AppResult;
 use veyak_models::{
     ActiveState, AppSettings, HttpMethod, RequestItem, Theme, ThemeTokens, Workspace,
 };
-use serde::{Serialize, de::DeserializeOwned};
 
 #[derive(Debug, Clone)]
 pub struct DataDir {

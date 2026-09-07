@@ -2,12 +2,12 @@
 // Auth commands — Tauri command wrappers for the auth module
 // ---------------------------------------------------------------------------
 
-use veyak_error::{AppError, AppResult};
-use veyak_models::{AuthState, PkceSession, User};
 use std::sync::Arc;
 use tauri::command;
 use tauri::State;
 use tokio::sync::Mutex;
+use veyak_error::{AppError, AppResult};
+use veyak_models::{AuthState, PkceSession, User};
 
 use crate::state::AppState;
 use veyak_auth as auth_core;

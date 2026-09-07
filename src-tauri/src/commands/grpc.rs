@@ -1,4 +1,9 @@
 use crate::state::AppState;
+use std::collections::BTreeMap;
+use std::time::Instant;
+use tauri::{command, AppHandle, Emitter, Manager, State, Window};
+use tokio_util::sync::CancellationToken;
+use uuid::Uuid;
 use veyak_error::AppResult;
 use veyak_grpc::client::{
     descriptor_pool_to_services, find_method_descriptor, invoke_unary, start_grpc_stream,
@@ -6,11 +11,6 @@ use veyak_grpc::client::{
 };
 use veyak_grpc::manager::GrpcActiveStream;
 use veyak_models::{GrpcRequest, GrpcResponse, GrpcService, GrpcStreamEvent};
-use std::collections::BTreeMap;
-use std::time::Instant;
-use tauri::{command, AppHandle, Emitter, Manager, State, Window};
-use tokio_util::sync::CancellationToken;
-use uuid::Uuid;
 
 #[command]
 pub async fn grpc_reflect(

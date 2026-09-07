@@ -1,4 +1,6 @@
 use crate::state::AppState;
+use std::collections::BTreeMap;
+use tauri::{command, AppHandle, Emitter, Manager, State, Window};
 use veyak_error::AppResult;
 use veyak_graphql::{
     client::execute_graphql, introspection::fetch_schema, state::GraphQlSubscriptionHandle,
@@ -8,8 +10,6 @@ use veyak_models::{
     AuthConfig, AuthType, GraphQlRequest, GraphQlResponse, GraphQlSchema, GraphQlSubscriptionEvent,
     KeyValueRow,
 };
-use std::collections::BTreeMap;
-use tauri::{command, AppHandle, Emitter, Manager, State, Window};
 
 /// Convert a `Vec<KeyValueRow>` into a `BTreeMap`, skipping disabled/empty rows.
 fn rows_to_map(rows: &[KeyValueRow]) -> BTreeMap<String, String> {

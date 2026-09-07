@@ -1,7 +1,7 @@
-use veyak_error::{AppError, AppResult};
-use veyak_models::GraphQlResponse;
 use std::collections::BTreeMap;
 use std::time::Instant;
+use veyak_error::{AppError, AppResult};
+use veyak_models::GraphQlResponse;
 
 use crate::introspection::build_client;
 

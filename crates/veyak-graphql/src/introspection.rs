@@ -1,6 +1,6 @@
+use std::collections::BTreeMap;
 use veyak_error::{AppError, AppResult};
 use veyak_models::{GraphQlArg, GraphQlField, GraphQlSchema, GraphQlSchemaType, GraphQlTypeRef};
-use std::collections::BTreeMap;
 
 /// The standard GraphQL introspection query (full schema).
 const INTROSPECTION_QUERY: &str = r#"

@@ -1,7 +1,7 @@
 use crate::state::AppState;
+use tauri::State;
 use veyak_error::AppResult;
 use veyak_models::HistoryEntry;
-use tauri::State;
 
 #[tauri::command]
 pub async fn list_history(state: State<'_, AppState>, limit: i64) -> AppResult<Vec<HistoryEntry>> {

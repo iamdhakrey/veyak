@@ -1,6 +1,6 @@
+use tauri::State;
 use veyak_error::AppResult;
 use veyak_models::AppSettings;
-use tauri::State;
 
 use crate::state::AppState;
 
