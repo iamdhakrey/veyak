@@ -143,7 +143,6 @@ pub async fn start_subscription(
         "payload": payload,
     });
 
-    println!("subscribe_msg: {:#?}", subscribe_msg);
     write
         .send(Message::Text(subscribe_msg.to_string().into()))
         .await
@@ -170,7 +169,6 @@ pub async fn start_subscription(
                     break;
                 }
                 msg = read.next() => {
-                    println!("message: {:?}", msg);
                     match msg {
                         Some(Ok(Message::Text(txt))) => {
                             let val: serde_json::Value =

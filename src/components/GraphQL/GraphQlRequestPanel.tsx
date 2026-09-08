@@ -8,15 +8,10 @@ import {
   LayoutGrid,
   List,
 } from "lucide-react";
-import Editor, { useMonaco } from "@monaco-editor/react";
+import CodeEditor from "../CodeEditor";
 import { useVartaStore } from "../../store/vartaStore";
-import {
-  useSettingsStore,
-  DEFAULT_FONT_SETTINGS,
-} from "../../store/settingStore";
 import { GraphQlHeaderRow, GraphQlSchemaField } from "../../types";
 import AuthTab from "../RequestEditor/AuthTab";
-import { registerGraphQlCompletionProvider } from "./graphqlCompletion";
 import InsertQueryModal from "./InsertQueryModal";
 import {
   generateOperation,
@@ -38,16 +33,6 @@ interface Props {
   isMobile?: boolean;
 }
 
-// Initialize monaco-graphql language extension once
-let graphqlLangInitialized = false;
-function ensureGraphQlLanguage() {
-  if (graphqlLangInitialized) return;
-  graphqlLangInitialized = true;
-  import("monaco-graphql").catch(() => {
-    // graceful fallback
-  });
-}
-
 export default function GraphQlRequestPanel({ isMobile = false }: Props) {
   const [activeTab, setActiveTab] = useState<GqlReqTab>("query");
   const [activeOpFilter, setActiveOpFilter] = useState<
@@ -67,12 +52,6 @@ export default function GraphQlRequestPanel({ isMobile = false }: Props) {
   const headers = useVartaStore((s) => s.graphqlHeaders);
   const setHeaders = useVartaStore((s) => s.setGraphqlHeaders);
   const schema = useVartaStore((s) => s.graphqlSchema);
-
-  const monaco = useMonaco();
-
-  const settingsFont = useSettingsStore((s) => s.settings?.font);
-  const { fontFamily, fontSize, enableLigatures, lineHeight } =
-    settingsFont || DEFAULT_FONT_SETTINGS;
 
   const req = activeTabData?.request as any;
   const query: string = req?.query ?? "{\n  \n}";
@@ -151,16 +130,6 @@ export default function GraphQlRequestPanel({ isMobile = false }: Props) {
     return () => el.removeEventListener("wheel", handleWheel);
   }, [docOperations]);
 
-  useEffect(() => {
-    ensureGraphQlLanguage();
-  }, []);
-
-  // Register schema-aware autocompletion whenever monaco or schema updates
-  useEffect(() => {
-    if (!monaco || !schema) return;
-    const disposable = registerGraphQlCompletionProvider(monaco, schema);
-    return () => disposable.dispose();
-  }, [monaco, schema]);
 
   const addHeaderRow = () => {
     setHeaders([
@@ -414,29 +383,14 @@ export default function GraphQlRequestPanel({ isMobile = false }: Props) {
               </div>
             )}
 
-            {/* Monaco Editor */}
+            {/* CodeJar Editor */}
             <div className="flex-1 overflow-hidden">
-              <Editor
-                height="100%"
+              <CodeEditor
                 language="graphql"
                 value={query}
-                onChange={(v) => updateActiveRequest({ query: v ?? "" } as any)}
-                theme="vs-dark"
-                options={{
-                  fontFamily,
-                  fontSize,
-                  lineHeight,
-                  fontLigatures: enableLigatures,
-                  minimap: { enabled: false },
-                  scrollBeyondLastLine: false,
-                  padding: { top: 12, bottom: 12 },
-                  wordWrap: "on",
-                  tabSize: 2,
-                  renderLineHighlight: "none",
-                  overviewRulerBorder: false,
-                  suggestOnTriggerCharacters: true,
-                  quickSuggestions: true,
-                }}
+                onChange={(v) => updateActiveRequest({ query: v } as any)}
+                lineNumbers
+                placeholder="query MyQuery {\n  \n}"
               />
             </div>
           </div>
@@ -444,28 +398,17 @@ export default function GraphQlRequestPanel({ isMobile = false }: Props) {
 
         {/* Variables tab */}
         {activeTab === "variables" && (
-          <Editor
-            height="100%"
-            language="json"
-            value={variables}
-            onChange={(v) =>
-              updateActiveRequest({ variables: v ?? "{}" } as any)
-            }
-            theme="vs-dark"
-            options={{
-              fontFamily,
-              fontSize,
-              lineHeight,
-              fontLigatures: enableLigatures,
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              padding: { top: 12, bottom: 12 },
-              wordWrap: "on",
-              tabSize: 2,
-              renderLineHighlight: "none",
-              overviewRulerBorder: false,
-            }}
-          />
+          <div className="flex-1 overflow-hidden">
+            <CodeEditor
+              language="json"
+              value={variables}
+              onChange={(v) =>
+                updateActiveRequest({ variables: v } as any)
+              }
+              lineNumbers
+              placeholder="{\n  \n}"
+            />
+          </div>
         )}
 
         {/* Headers tab */}
