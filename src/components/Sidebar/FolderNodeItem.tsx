@@ -175,7 +175,7 @@ export const FolderNodeItem: React.FC<{
                 {isMenuOpen && (
                   <div
                     onClick={(e) => e.stopPropagation()} // Prevent folder from toggling when clicking inside menu
-                    className="absolute right-0 top-full mt-1 w-40 py-1 z-50 bg-panel-raised border border-border shadow-elevated rounded-md animate-in fade-in zoom-in-95 duration-100"
+                    className="absolute right-0 top-full mt-1 w-45 py-1 z-50 bg-panel-raised border border-border shadow-elevated rounded-md animate-in fade-in zoom-in-95 duration-100"
                   >
                     {additionTypes.map((type) => {
                       const IconComp = (Icons as any)[type.icon] || Icons.FilePlus;
@@ -195,7 +195,7 @@ export const FolderNodeItem: React.FC<{
                       );
                     })}
 
-                    <div className="h-px bg-borderMuted my-1 mx-2" />
+                    <div className="h-px bg-border my-1 mx-2" />
 
                     <button
                       onClick={() => {
