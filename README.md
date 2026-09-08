@@ -41,7 +41,7 @@ Tired of clunky API clients that consume 1 GB+ of RAM, take 10 seconds to open, 
 | **Startup Time** | 4 – 10 seconds | **< 100 milliseconds** |
 | **Protocols** | Plugin/Tier-dependent | **REST, gRPC, WebSockets & GraphQL** |
 | **Data Privacy** | Cloud-forced sync | **100% Offline-first (Local Files)** |
-| **Code Editor** | Basic text inputs | **Full VS Code Monaco Editor** |
+| **Code Editor** | Basic text inputs | **Ultra-lightweight CodeJar & PrismJS Editor** |
 
 ---
 
@@ -62,7 +62,7 @@ Tired of clunky API clients that consume 1 GB+ of RAM, take 10 seconds to open, 
 ### Modern Developer Experience
 - **Command Palette (`Cmd/Ctrl + K`)**: Instant keyboard-driven navigation across tabs, requests, collections, and tools.
 - **Ultra-Sleek Titlebar Breadcrumb**: Switch Workspaces, Collections, and Environments in a single click straight from the header.
-- **Monaco Editor**: The same editor engine that powers VS Code - featuring full syntax highlighting, folding, and JSON prettification.
+- **Lightweight Code Editor**: Powered by CodeJar & PrismJS — zero-bloat micro editor with instant startup, synchronized line numbers, and dark syntax highlighting.
 - **Dynamic Environment Variables**: Seamless interpolation with `{{variable}}` syntax, secret masking, and instant environment swapping.
 - **Workspaces & Nested Collections**: Organize endpoints into deep folder hierarchies with intuitive tab management.
 - **Privacy First**: Your requests and environment variables stay on your machine.
@@ -81,7 +81,7 @@ Tired of clunky API clients that consume 1 GB+ of RAM, take 10 seconds to open, 
 │   • React 19               │   • Tauri 2.0 (Rust)       │
 │   • TypeScript             │   • Tokio (Async Runtime)  │
 │   • Tailwind CSS 4         │   • Reqwest (HTTP Engine)  │
-│   • Monaco Editor          │   • Tonic / Prost (gRPC)   │
+│   • CodeJar & PrismJS      │   • Tonic / Prost (gRPC)   │
 │   • Zustand (State Engine) │   • Local Storage          │
 └────────────────────────────┴────────────────────────────┘
 ```

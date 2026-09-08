@@ -1,9 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Send, Radio } from "lucide-react";
-import Editor from "@monaco-editor/react";
+import CodeEditor from "../CodeEditor";
 import { useVartaStore } from "../../store/vartaStore";
-import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "../../store/settingStore";
 import { GrpcMetadataRow } from "../../types";
 
 type GrpcReqTab = "message" | "metadata";
@@ -28,8 +27,6 @@ export default function GrpcRequestPanel({ isMobile = false }: GrpcRequestPanelP
   const callStatus = useVartaStore((s) => s.grpcCallStatus);
   const sendGrpcMessage = useVartaStore((s) => s.sendGrpcMessage);
 
-  const settingsFont = useSettingsStore((s) => s.settings?.font);
-  const { fontFamily, fontSize, enableLigatures, lineHeight } = settingsFont || DEFAULT_FONT_SETTINGS;
 
   const isStreaming = callStatus === "streaming";
   const acceptsOutbound =
@@ -118,34 +115,15 @@ export default function GrpcRequestPanel({ isMobile = false }: GrpcRequestPanelP
               </div>
             )}
 
-            {/* Monaco Editor */}
-            <div className="flex-1 min-h-0">
-              <Editor
-                height="100%"
-                defaultLanguage="json"
+            {/* CodeJar Editor */}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <CodeEditor
+                language="json"
                 value={requestBody}
-                onChange={(value) => setRequestBody(value ?? "")}
-                theme="vs-dark"
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: isMobile ? 12.5 : fontSize,
-                  fontFamily,
-                  fontLigatures: enableLigatures,
-                  lineHeight: lineHeight * (isMobile ? 12.5 : fontSize),
-                  lineNumbers: "on",
-                  scrollBeyondLastLine: false,
-                  automaticLayout: true,
-                  tabSize: 2,
-                  wordWrap: "on",
-                  padding: { top: 8 },
-                  renderLineHighlight: "none",
-                  overviewRulerLanes: 0,
-                  hideCursorInOverviewRuler: true,
-                  scrollbar: {
-                    verticalScrollbarSize: 8,
-                    horizontalScrollbarSize: 8,
-                  },
-                }}
+                onChange={setRequestBody}
+                fontSize={isMobile ? 12.5 : undefined}
+                lineNumbers
+                placeholder="{\n  \n}"
               />
             </div>
 

@@ -13,9 +13,8 @@ import {
   AlertTriangle,
   Activity,
 } from "lucide-react";
-import Editor from "@monaco-editor/react";
+import CodeEditor from "../CodeEditor";
 import { useVartaStore } from "../../store/vartaStore";
-import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "../../store/settingStore";
 import { GraphQlCallStatus, RequestTab } from "../../types";
 
 type ResTab = "response" | "headers" | "events";
@@ -79,8 +78,6 @@ export default function GraphQlResponsePanel({ isMobile = false, tab }: Props) {
   const subMessages = tab.graphqlSubscriptionMessages || [];
   const cancelSub = useVartaStore((s) => s.cancelGraphqlSubscription);
 
-  const settingsFont = useSettingsStore((s) => s.settings?.font);
-  const { fontFamily, fontSize, lineHeight } = settingsFont || DEFAULT_FONT_SETTINGS;
 
   const logEndRef = useRef<HTMLDivElement>(null);
   const isStreaming = callStatus === "streaming";
@@ -292,23 +289,11 @@ export default function GraphQlResponsePanel({ isMobile = false, tab }: Props) {
             {/* Data viewer */}
             {(response?.data || (response && !response.errors)) && (
               <div className="flex-1 overflow-hidden">
-                <Editor
-                  height="100%"
+                <CodeEditor
                   language="json"
                   value={response?.data ?? (callStatus === "sending" ? "" : "null")}
-                  theme="vs-dark"
-                  options={{
-                    fontFamily,
-                    fontSize,
-                    lineHeight,
-                    readOnly: true,
-                    minimap: { enabled: false },
-                    scrollBeyondLastLine: false,
-                    padding: { top: 12, bottom: 12 },
-                    wordWrap: "on",
-                    renderLineHighlight: "none",
-                    overviewRulerBorder: false,
-                  }}
+                  readOnly
+                  lineNumbers
                 />
               </div>
             )}

@@ -1,9 +1,8 @@
 import { useRef } from "react";
-import Editor from "@monaco-editor/react";
+import CodeEditor from "../CodeEditor";
 import { Wand2, Upload, File as FileIcon, X } from "lucide-react";
 import KeyValueTable from "./KeyValueTable";
 import { BodyMode, RequestBody } from "@veyak-internal/models";
-import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "../../store/settingStore";
 
 const MODES: { id: BodyMode; label: string }[] = [
   { id: "json", label: "JSON" },
@@ -29,8 +28,6 @@ interface Props {
 
 export default function BodyTab({ body, onChange, isMobile = false }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const settingsFont = useSettingsStore((s) => s.settings?.font);
-  const { fontFamily, fontSize, enableLigatures, lineHeight } = settingsFont || DEFAULT_FONT_SETTINGS;
 
   function setMode(mode: BodyMode) {
     onChange({ ...body, mode });
@@ -91,22 +88,13 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
 
       {body.mode === "json" && (
         <div className="flex-1 overflow-hidden rounded-md border border-border">
-          <Editor
-            height="100%"
-            defaultLanguage="json"
-            theme="vs-dark"
+          <CodeEditor
+            language="json"
             value={body.raw}
-            onChange={(v) => onChange({ ...body, raw: v ?? "" })}
-            options={{
-              fontFamily,
-              fontSize: isMobile ? 12 : fontSize,
-              fontLigatures: enableLigatures,
-              lineHeight: lineHeight * (isMobile ? 12 : fontSize),
-              minimap: { enabled: false },
-              scrollBeyondLastLine: false,
-              padding: { top: 12 },
-              wordWrap: isMobile ? "on" : "off",
-            }}
+            onChange={(v) => onChange({ ...body, raw: v })}
+            fontSize={isMobile ? 12 : undefined}
+            lineNumbers
+            placeholder="{\n  \n}"
           />
         </div>
       )}
