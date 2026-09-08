@@ -1,6 +1,6 @@
 [package]
 name = "veyak"
-version = "0.6.0"
+version = "0.6.1"
 description = "A Tauri App"
 authors = ["Hrithik Dhakrey <dhakreyhrithik@gmail.com>"]
 edition = "2021"
