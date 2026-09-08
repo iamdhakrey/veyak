@@ -11,7 +11,7 @@
 [![React 19](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 
 <p align="center">
-  <a href="#-why-veyak">Why Veyak?</a> •
+  <a href="#why-veyak">Why Veyak?</a> •
   <a href="https://veyak.iamdhakrey.dev/">Key Features</a> •
   <a href="https://veyak.iamdhakrey.dev/docs/">Tech Stack</a> •
   <a href="https://veyak.iamdhakrey.dev/docs/getting-started/">Getting Started</a> •
