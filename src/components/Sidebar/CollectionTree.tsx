@@ -126,7 +126,7 @@ export const CollectionsTree: React.FC = () => {
                 </button>
 
                 {activeMenuOpen && (
-                  <div className="absolute right-0 top-full mt-1 w-38 py-1 z-50 bg-panel-raised border border-border shadow-elevated rounded-md animate-in fade-in zoom-in-95 duration-100">
+                  <div className="absolute right-0 top-full mt-1 w-45 py-1 z-50 bg-panel-raised border border-border shadow-elevated rounded-md animate-in fade-in zoom-in-95 duration-100">
                     {additionTypes.map((type) => {
                       const IconComp = (Icons as any)[type.icon] || Icons.FilePlus;
                       return (
