@@ -1,6 +1,9 @@
 <div align="center">
+  
+  
+<img src="public/icon.png" alt="Veyak Icon" width="100" height="100" style="border-radius: 20px; box-shadow: 0 0 35px rgba(99, 102, 241, 0.4);" />
 
-# ⚡ Veyak API Client
+# Veyak API Client
 
 **The Blazing-Fast, Lightweight, Native Multi-Protocol API Client.**
 
