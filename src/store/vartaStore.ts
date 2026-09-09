@@ -59,6 +59,7 @@ interface VartaState {
   disconnectWebSocket: () => Promise<void>;
   sendWsMessage: (message: string) => Promise<void>;
   addWsMessage: (msg: WsMessage) => void;
+  clearWsMessages: (tabId?: string) => void;
   loadSavedMessages: (requestId: string) => Promise<void>;
   addSavedMessage: (
     requestId: string,
@@ -122,7 +123,7 @@ interface VartaState {
   setGraphqlSchema: (schema: GraphQlSchema | null) => void;
   setGraphqlHeaders: (rows: GraphQlHeaderRow[]) => void;
   addGraphqlSubscriptionMessage: (msg: GraphQlSubscriptionMessage) => void;
-  clearGraphqlMessages: () => void;
+  clearGraphqlMessages: (tabId?: string) => void;
   loadGraphqlSchema: (targetUrl?: string) => Promise<void>;
   invokeGraphql: (targetTabId?: string) => Promise<void>;
   subscribeGraphql: (targetTabId?: string) => Promise<void>;
@@ -566,6 +567,20 @@ export const useVartaStore = create<VartaState>((set, get) => ({
         return t;
       }),
     }));
+  },
+
+  clearWsMessages: (tabId?: string) => {
+    const targetId = tabId || get().activeTabId;
+    if (!targetId) return;
+    set((s) => {
+      const updatedTabs = s.tabs.map((t) =>
+        t.id === targetId ? { ...t, wsMessages: [] } : t,
+      );
+      return {
+        tabs: updatedTabs,
+        activeTab: updatedTabs.find((t) => t.id === s.activeTabId) || null,
+      };
+    });
   },
 
   loadSavedMessages: async (requestId: string) => {
@@ -1015,8 +1030,22 @@ export const useVartaStore = create<VartaState>((set, get) => ({
     set((s) => ({
       graphqlSubscriptionMessages: [...s.graphqlSubscriptionMessages, msg],
     })),
-  clearGraphqlMessages: () =>
-    set({ graphqlSubscriptionMessages: [], graphqlResponse: null }),
+  clearGraphqlMessages: (tabId?: string) => {
+    const targetId = tabId || get().activeTabId;
+    set((s) => {
+      const updatedTabs = s.tabs.map((t) =>
+        t.id === targetId
+          ? { ...t, graphqlSubscriptionMessages: [], graphqlResponse: null }
+          : t,
+      );
+      return {
+        graphqlSubscriptionMessages: [],
+        graphqlResponse: null,
+        tabs: updatedTabs,
+        activeTab: updatedTabs.find((t) => t.id === s.activeTabId) || null,
+      };
+    });
+  },
 
   loadGraphqlSchema: async (targetUrl?: string) => {
     const { activeTab } = get();

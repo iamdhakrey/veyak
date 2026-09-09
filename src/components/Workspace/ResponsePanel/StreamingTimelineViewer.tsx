@@ -51,9 +51,7 @@ export default function StreamingTimelineViewer({
   // Store actions & state
   const sendWsMessage = useVartaStore((s) => s.sendWsMessage);
   const disconnectWebSocket = useVartaStore((s) => s.disconnectWebSocket);
-  const clearWsMessages = () => {
-    tab.wsMessages = [];
-  };
+  const clearWsMessages = useVartaStore((s) => s.clearWsMessages);
 
   // gRPC store
   const grpcMessages = useVartaStore((s) => s.grpcMessages);
@@ -174,9 +172,9 @@ export default function StreamingTimelineViewer({
   // Handle Clear
   const handleClear = () => {
     setSelectedItem(null);
-    if (isWs) clearWsMessages();
+    if (isWs) clearWsMessages(tab.id);
     else if (isGrpc) clearGrpcMessages();
-    else if (isGraphQl) clearGqlMessages();
+    else if (isGraphQl) clearGqlMessages(tab.id);
   };
 
   // Connection status & label
