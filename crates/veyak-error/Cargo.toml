@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+keyring = "4.2.0"
 prost-reflect = "0.16.5"
 serde = { workspace = true , features = ["derive"] }
 serde_json = { workspace = true }

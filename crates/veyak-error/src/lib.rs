@@ -52,6 +52,9 @@ pub enum AppError {
     #[error("grpc status error [{}] {}", .0.code(), .0.message())]
     TonicStatus(#[from] tonic::Status),
 
+    #[error("Keyring error: {0}")]
+    Keyring(#[from] keyring::Error),
+
     // #[error("{0}")]
     // StringError(#[from] std::string::String),
     #[error("{0}")]

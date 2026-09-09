@@ -4,13 +4,14 @@
 // This replaces the TS files: useAuth0Desktop.ts, userService.ts, tokenStore.ts
 // ---------------------------------------------------------------------------
 
+use keyring::Entry;
 use rand::RngExt;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use veyak_models::{AuthState, AuthTokens, User};
 
-use veyak_db::{DataDir, read_yaml_or_default, write_yaml};
 use veyak_error::{AppError, AppResult};
+use zeroize::Zeroize as _;
 
 // ── Configuration ───────────────────────────────────────────────────────
 
@@ -40,6 +41,7 @@ struct UserInfoResponse {
 
 // ── PKCE Utilities ──────────────────────────────────────────────────────
 
+const SERVICE_NAME: &str = "veyak";
 const CHARSET: &[u8] = b"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
 /// Generates a cryptographically random string of the given length using
@@ -91,28 +93,39 @@ fn parse_jwt_exp(token: &str) -> Option<u64> {
     claims.exp
 }
 
-// ── Persistence ─────────────────────────────────────────────────────────
+pub fn load_auth_state() -> AppResult<AuthState> {
+    let entry = Entry::new(SERVICE_NAME, "veyak").map_err(AppError::Keyring)?;
 
-trait AuthPath {
-    fn auth_path(&self) -> std::path::PathBuf;
+    let mut raw_data = match entry.get_password() {
+        Ok(data) => data,
+        Err(keyring::Error::NoEntry) => {
+            return Err(AppError::Other("Auth state not found".to_string()));
+        }
+        Err(e) => return Err(AppError::Keyring(e)),
+    };
+
+    let state: AuthState = serde_json::from_str(&raw_data)?;
+
+    raw_data.zeroize();
+
+    Ok(state)
 }
 
-impl AuthPath for DataDir {
-    fn auth_path(&self) -> std::path::PathBuf {
-        self.root().join("auth.yaml")
+pub fn save_auth_state(state: &AuthState) -> AppResult<()> {
+    let entry = Entry::new(SERVICE_NAME, "veyak").map_err(AppError::Keyring)?;
+    let mut serialized = serde_json::to_string(state)?;
+    let result = entry.set_password(&serialized);
+    serialized.zeroize();
+
+    result.map_err(AppError::Keyring)
+}
+
+pub fn clear_auth_state() -> AppResult<()> {
+    let entry = Entry::new(SERVICE_NAME, "veyak").map_err(AppError::Keyring)?;
+    match entry.delete_credential() {
+        Ok(_) | Err(keyring::Error::NoEntry) => Ok(()),
+        Err(e) => Err(AppError::Keyring(e)),
     }
-}
-
-pub fn load_auth_state(dd: &DataDir) -> AppResult<AuthState> {
-    read_yaml_or_default(&dd.auth_path())
-}
-
-pub fn save_auth_state(dd: &DataDir, state: &AuthState) -> AppResult<()> {
-    write_yaml(&dd.auth_path(), state)
-}
-
-pub fn clear_auth_state(dd: &DataDir) -> AppResult<()> {
-    save_auth_state(dd, &AuthState::default())
 }
 
 // ── Auth0 API calls ─────────────────────────────────────────────────────
