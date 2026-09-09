@@ -35,6 +35,13 @@ export interface StreamTimelineItem {
   sizeBytes?: number;
 }
 
+/**
+ * Displays and manages a streaming event timeline for WebSocket, gRPC, or GraphQL requests.
+ *
+ * @param tab - Request tab containing the stream configuration and event data
+ * @param isMobile - Whether to use the mobile layout
+ * @returns The streaming timeline viewer interface
+ */
 export default function StreamingTimelineViewer({
   tab,
   isMobile = false,
