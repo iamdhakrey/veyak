@@ -250,32 +250,29 @@ export default function StreamingTimelineViewer({
         <div className="flex items-center rounded-md border border-border bg-panel p-0.5 text-xs">
           <button
             onClick={() => setDirectionFilter("all")}
-            className={`px-2 py-0.5 rounded transition-colors ${
-              directionFilter === "all"
+            className={`px-2 py-0.5 rounded transition-colors ${directionFilter === "all"
                 ? "bg-primary/20 text-primary font-medium"
                 : "text-text-muted hover:text-text-secondary"
-            }`}
+              }`}
           >
             All
           </button>
           <button
             onClick={() => setDirectionFilter("sent")}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${
-              directionFilter === "sent"
+            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${directionFilter === "sent"
                 ? "bg-primary/20 text-primary font-medium"
                 : "text-text-muted hover:text-text-secondary"
-            }`}
+              }`}
           >
             <ArrowUp size={11} />
             Sent
           </button>
           <button
             onClick={() => setDirectionFilter("received")}
-            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${
-              directionFilter === "received"
+            className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${directionFilter === "received"
                 ? "bg-secondary/20 text-secondary font-medium"
                 : "text-text-muted hover:text-text-secondary"
-            }`}
+              }`}
           >
             <ArrowDown size={11} />
             Received
@@ -307,11 +304,10 @@ export default function StreamingTimelineViewer({
         {/* Error filter toggle */}
         <button
           onClick={() => setErrorOnly((e) => !e)}
-          className={`flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors ${
-            errorOnly
+          className={`flex items-center gap-1 rounded px-2 py-1 text-xs transition-colors ${errorOnly
               ? "bg-error/20 text-error font-medium"
               : "text-text-muted hover:text-text-secondary"
-          }`}
+            }`}
         >
           <AlertCircle size={12} />
           Errors Only
@@ -331,9 +327,8 @@ export default function StreamingTimelineViewer({
       <div className="flex-1 flex min-h-0 overflow-hidden flex-col md:flex-row">
         {/* Timeline Log Table */}
         <div
-          className={`flex-1 overflow-y-auto ${
-            selectedItem ? "md:border-r border-border md:w-1/2" : "w-full"
-          }`}
+          className={`flex-1 overflow-y-auto ${selectedItem ? "md:border-r border-border md:w-1/2" : "w-full"
+            }`}
         >
           {filteredItems.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-text-muted text-xs">
@@ -370,11 +365,10 @@ export default function StreamingTimelineViewer({
                   <div
                     key={item.id}
                     onClick={() => setSelectedItem(item)}
-                    className={`group flex items-center gap-2.5 px-4 py-2 cursor-pointer transition-colors ${
-                      isSelected
+                    className={`group flex items-center gap-2.5 px-4 py-2 cursor-pointer transition-colors ${isSelected
                         ? "bg-primary/15 border-l-2 border-primary"
                         : "hover:bg-panel-raised/40 border-l-2 border-transparent"
-                    }`}
+                      }`}
                   >
                     {/* Direction Icon */}
                     <div className="shrink-0">
@@ -388,13 +382,12 @@ export default function StreamingTimelineViewer({
                     {/* Direction / Opcode badge */}
                     {item.eventType && (
                       <span
-                        className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                          item.isError
+                        className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${item.isError
                             ? "bg-error/20 text-error"
                             : isSent
-                            ? "bg-primary/20 text-primary"
-                            : "bg-secondary/20 text-secondary"
-                        }`}
+                              ? "bg-primary/20 text-primary"
+                              : "bg-secondary/20 text-secondary"
+                          }`}
                       >
                         {item.eventType}
                       </span>
@@ -436,11 +429,10 @@ export default function StreamingTimelineViewer({
                   Frame Inspector
                 </span>
                 <span
-                  className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${
-                    selectedItem.direction === "sent"
+                  className={`rounded px-1.5 py-0.5 text-[9px] font-bold uppercase ${selectedItem.direction === "sent"
                       ? "bg-primary/20 text-primary"
                       : "bg-secondary/20 text-secondary"
-                  }`}
+                    }`}
                 >
                   {selectedItem.direction}
                 </span>
