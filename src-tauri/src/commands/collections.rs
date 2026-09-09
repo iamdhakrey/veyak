@@ -227,7 +227,14 @@ pub async fn duplicate_request(
     crate::db::collections::duplicate_request(&state.data_dir, &requestid)
 }
 
-#[tauri::command]
+/// Saves a request and marks it as the active request.
+///
+/// # Examples
+///
+/// ```ignore
+/// save_request(state, request).await?;
+/// ```
+pub async fn save_request(state: State<'_, AppState>, request: RequestItem) -> AppResult<()> {
 pub async fn save_request(state: State<'_, AppState>, request: RequestItem) -> AppResult<()> {
     crate::db::collections::save_request(&state.data_dir, &request)?;
     crate::db::app_state::set_active_request(&state.data_dir, Some(&request.id()))?;
