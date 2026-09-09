@@ -98,13 +98,11 @@ pub fn load_auth_state() -> AppResult<AuthState> {
 
     let mut raw_data = match entry.get_password() {
         Ok(data) => data,
-        Err(keyring::Error::NoEntry) => {
-            return Err(AppError::Other("Auth state not found".to_string()));
-        }
+        Err(keyring::Error::NoEntry) => return Ok(AuthState::default()),
         Err(e) => return Err(AppError::Keyring(e)),
     };
 
-    let state: AuthState = serde_json::from_str(&raw_data)?;
+    let state = serde_json::from_str::<AuthState>(&raw_data)?;
 
     raw_data.zeroize();
 
