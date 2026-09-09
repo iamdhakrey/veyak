@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { RequestTab } from "../../types";
-import { useVartaStore } from "../../store/vartaStore";
+import { RequestTab } from "../../../../types";
+import { useVartaStore } from "../../../../store/vartaStore";
 import { Save, Send, Trash2, X } from "lucide-react";
 import { WsSavedMessage } from "@veyak-internal/models";
 
-function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
+interface WsSavedTabProps {
+  tab: RequestTab;
+  isMobile?: boolean;
+}
+
+export default function WsSavedTab({ tab, isMobile = false }: WsSavedTabProps) {
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [newMsgName, setNewMsgName] = useState("");
   const [newMsgData, setNewMsgData] = useState("");
@@ -21,6 +26,7 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
       loadSavedMessages(tab.request.id);
     }
   }, [tab.request.id, loadSavedMessages]);
+
   const handleSaveMessage = async () => {
     if (!newMsgName.trim() || !newMsgData.trim()) return;
     await addSavedMessage(tab.request.id, newMsgName.trim(), newMsgData.trim());
@@ -36,7 +42,7 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
 
   return (
     <div
-      className={`flex-1 overflow-y-auto ${isMobile ? "px-3 py-2" : "px-4 py-3"}`}
+      className={`h-full overflow-y-auto ${isMobile ? "px-3 py-2" : "px-4 py-3"}`}
     >
       {/* Add new saved message form */}
       {showSaveForm && (
@@ -47,7 +53,7 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
             </span>
             <button
               onClick={() => setShowSaveForm(false)}
-              className="p-1 text-text-muted hover:text-text-primary rounded"
+              className="p-1 text-text-muted hover:text-text-primary rounded cursor-pointer"
             >
               <X size={14} />
             </button>
@@ -69,14 +75,14 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setShowSaveForm(false)}
-              className="rounded-md border border-border px-3 py-1 text-xs text-text-secondary hover:bg-panel-raised"
+              className="rounded-md border border-border px-3 py-1 text-xs text-text-secondary hover:bg-panel-raised cursor-pointer"
             >
               Cancel
             </button>
             <button
               onClick={handleSaveMessage}
               disabled={!newMsgName.trim() || !newMsgData.trim()}
-              className="rounded-md bg-brand-gradient px-3 py-1 text-xs font-medium text-white hover:opacity-90 disabled:opacity-40"
+              className="rounded-md bg-brand-gradient px-3 py-1 text-xs font-medium text-white hover:opacity-90 disabled:opacity-40 cursor-pointer"
             >
               Save
             </button>
@@ -91,7 +97,7 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
             setNewMsgData("");
             setShowSaveForm(true);
           }}
-          className="mb-3 flex items-center gap-1.5 rounded-md border border-dashed border-border px-3 py-2 text-xs text-text-secondary hover:border-primary/50 hover:text-text-primary transition-colors w-full justify-center"
+          className="mb-3 flex items-center gap-1.5 rounded-md border border-dashed border-border px-3 py-2 text-xs text-text-secondary hover:border-primary/50 hover:text-text-primary transition-colors w-full justify-center cursor-pointer"
         >
           <Save size={12} />
           New saved message
@@ -118,14 +124,14 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
                   <button
                     onClick={() => handleSendSaved(msg)}
                     disabled={!isConnected}
-                    className="rounded p-1 text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="rounded p-1 text-primary hover:bg-primary/10 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                     title={isConnected ? "Send this message" : "Connect first"}
                   >
                     <Send size={13} />
                   </button>
                   <button
                     onClick={() => deleteSavedMessage(tab.request.id, msg.id)}
-                    className="rounded p-1 text-text-muted hover:text-error hover:bg-error/10"
+                    className="rounded p-1 text-text-muted hover:text-error hover:bg-error/10 cursor-pointer"
                     title="Delete saved message"
                   >
                     <Trash2 size={13} />
@@ -142,5 +148,3 @@ function SavedWSTab({ tab, isMobile }: { tab: RequestTab; isMobile: boolean }) {
     </div>
   );
 }
-
-export default SavedWSTab;

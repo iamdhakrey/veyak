@@ -7,23 +7,24 @@ const AUTH_TYPES: { id: AuthType; label: string }[] = [
   { id: "apiKey", label: "API key" },
 ];
 
-interface Props {
+interface AuthTabProps {
   auth: AuthConfig;
   onChange: (auth: AuthConfig) => void;
   isMobile?: boolean;
 }
 
-export default function AuthTab({ auth, onChange, isMobile = false }: Props) {
+export default function AuthTab({ auth, onChange, isMobile = false }: AuthTabProps) {
   return (
     <div
-      className={`${isMobile ? "flex flex-col gap-4 px-3 py-3" : "flex gap-6 px-4 py-4"
-        }`}
+      className={`h-full overflow-y-auto ${
+        isMobile ? "flex flex-col gap-4 px-3 py-3" : "flex gap-6 px-4 py-4"
+      }`}
     >
       {/* Auth type selector */}
       <div
         className={
           isMobile
-            ? "flex gap-1 overflow-x-auto scrollbar-hide"
+            ? "flex gap-1 overflow-x-auto scrollbar-hide shrink-0"
             : "w-44 shrink-0"
         }
       >
@@ -31,13 +32,15 @@ export default function AuthTab({ auth, onChange, isMobile = false }: Props) {
           <button
             key={t.id}
             onClick={() => onChange({ ...auth, type: t.id })}
-            className={`${isMobile
+            className={`${
+              isMobile
                 ? "shrink-0 rounded-md px-3 py-1.5"
                 : "block w-full rounded-md px-2.5 py-1.5"
-              } text-left text-sm ${auth.type === t.id
-                ? "bg-panel-raised text-text-primary"
+            } text-left text-sm cursor-pointer transition-colors ${
+              auth.type === t.id
+                ? "bg-panel-raised text-text-primary font-medium"
                 : "text-text-secondary hover:bg-panel-raised"
-              }`}
+            }`}
           >
             {t.label}
           </button>
@@ -127,7 +130,7 @@ export default function AuthTab({ auth, onChange, isMobile = false }: Props) {
                 })
               }
             />
-            <label className="text-sm text-text-secondary">
+            <label className="text-sm text-text-secondary flex items-center">
               Add to
               <select
                 value={auth.apiKey?.addTo ?? "header"}

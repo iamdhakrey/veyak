@@ -1,7 +1,7 @@
 import { useRef } from "react";
-import CodeEditor from "../CodeEditor";
+import CodeEditor from "../../../CodeEditor";
 import { Wand2, Upload, File as FileIcon, X } from "lucide-react";
-import KeyValueTable from "./KeyValueTable";
+import KeyValueTable from "../KeyValueTable";
 import { BodyMode, RequestBody } from "@veyak-internal/models";
 
 const MODES: { id: BodyMode; label: string }[] = [
@@ -20,25 +20,35 @@ function formatBytes(bytes: number | bigint): string {
   return `${(b / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-interface Props {
-  body: RequestBody;
+interface HttpBodyTabProps {
+  body?: RequestBody;
   onChange: (body: RequestBody) => void;
   isMobile?: boolean;
 }
 
-export default function BodyTab({ body, onChange, isMobile = false }: Props) {
+export default function HttpBodyTab({ body, onChange, isMobile = false }: HttpBodyTabProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const safeBody: RequestBody = {
+    ...body,
+    mode: body?.mode || "raw",
+    files: body?.files?.map((file) => ({
+      ...file,
+      id: file.id || crypto.randomUUID(),
+      sizeBytes: file.sizeBytes || BigInt(0),
+    })),
+  };
+
   function setMode(mode: BodyMode) {
-    onChange({ ...body, mode });
+    onChange({ ...safeBody, mode });
   }
 
   function formatJson() {
     try {
-      const parsed = JSON.parse(body.raw || "{}");
-      onChange({ ...body, raw: JSON.stringify(parsed, null, 2) });
+      const parsed = JSON.parse(safeBody.raw || "{}");
+      onChange({ ...safeBody, raw: JSON.stringify(parsed, null, 2) });
     } catch {
-      // invalid JSON — leave as-is; a real implementation surfaces an inline error
+      // invalid JSON — leave as-is
     }
   }
 
@@ -48,37 +58,42 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
       id: crypto.randomUUID(),
       name: f.name,
       sizeBytes: BigInt(f.size),
-      path: "", // Tauri provides the path; in a browser, this will be empty
+      path: "",
     }));
-    onChange({ ...body, files: [...(body.files ?? []), ...next] });
+    onChange({ ...safeBody, files: [...(safeBody.files ?? []), ...next] });
   }
 
   return (
     <div
-      className={`flex h-full flex-col ${isMobile ? "px-3 py-2.5" : "px-4 py-3"}`}
+      className={`flex h-full flex-col overflow-y-auto ${
+        isMobile ? "px-3 py-2.5" : "px-4 py-3"
+      }`}
     >
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between shrink-0">
         {/* Mode selector — scrollable on mobile */}
         <div
-          className={`flex gap-1 ${isMobile ? "overflow-x-auto scrollbar-hide" : ""}`}
+          className={`flex gap-1 ${
+            isMobile ? "overflow-x-auto scrollbar-hide" : ""
+          }`}
         >
           {MODES.map((m) => (
             <button
               key={m.id}
               onClick={() => setMode(m.id)}
-              className={`shrink-0 rounded-md px-2.5 py-1 text-sm ${body.mode === m.id
-                  ? "bg-panel-raised text-text-primary"
+              className={`shrink-0 rounded-md px-2.5 py-1 text-sm cursor-pointer transition-colors ${
+                safeBody.mode === m.id
+                  ? "bg-panel-raised text-text-primary font-medium"
                   : "text-text-secondary hover:bg-panel-raised"
-                }`}
+              }`}
             >
               {m.label}
             </button>
           ))}
         </div>
-        {body.mode === "json" && (
+        {safeBody.mode === "json" && (
           <button
             onClick={formatJson}
-            className="flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-text-secondary hover:bg-panel-raised ml-2"
+            className="flex shrink-0 items-center gap-1.5 rounded-md border border-border px-2.5 py-1 text-xs text-text-secondary hover:bg-panel-raised ml-2 transition-colors cursor-pointer"
           >
             <Wand2 size={12} />
             {isMobile ? "Format" : "Format JSON"}
@@ -86,12 +101,12 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
         )}
       </div>
 
-      {body.mode === "json" && (
-        <div className="flex-1 overflow-hidden rounded-md border border-border">
+      {safeBody.mode === "json" && (
+        <div className="flex-1 overflow-hidden rounded-md border border-border min-h-[160px]">
           <CodeEditor
             language="json"
-            value={body.raw}
-            onChange={(v) => onChange({ ...body, raw: v })}
+            value={safeBody.raw}
+            onChange={(v) => onChange({ ...safeBody, raw: v })}
             fontSize={isMobile ? 12 : undefined}
             lineNumbers
             placeholder="{\n  \n}"
@@ -99,32 +114,32 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
         </div>
       )}
 
-      {body.mode === "raw" && (
+      {safeBody.mode === "raw" && (
         <textarea
-          value={body.raw}
-          onChange={(e) => onChange({ ...body, raw: e.target.value })}
-          className="flex-1 resize-none rounded-md border border-border bg-panel p-3 font-mono text-sm text-text-primary outline-none focus:border-primary"
+          value={safeBody.raw}
+          onChange={(e) => onChange({ ...safeBody, raw: e.target.value })}
+          className="flex-1 resize-none rounded-md border border-border bg-panel p-3 font-mono text-sm text-text-primary outline-none focus:border-primary min-h-[160px]"
           placeholder="Raw request body…"
         />
       )}
 
-      {body.mode === "form-data" && (
+      {safeBody.mode === "form-data" && (
         <KeyValueTable
-          rows={body.formData ?? []}
-          onChange={(rows) => onChange({ ...body, formData: rows })}
+          rows={safeBody.formData ?? []}
+          onChange={(rows) => onChange({ ...safeBody, formData: rows })}
           isMobile={isMobile}
         />
       )}
 
-      {body.mode === "urlencoded" && (
+      {safeBody.mode === "urlencoded" && (
         <KeyValueTable
-          rows={body.urlEncoded ?? []}
-          onChange={(rows) => onChange({ ...body, urlEncoded: rows })}
+          rows={safeBody.urlEncoded ?? []}
+          onChange={(rows) => onChange({ ...safeBody, urlEncoded: rows })}
           isMobile={isMobile}
         />
       )}
 
-      {body.mode === "multipart" && (
+      {safeBody.mode === "multipart" && (
         <div className="flex-1">
           <div
             onDragOver={(e) => e.preventDefault()}
@@ -133,8 +148,9 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
               addFiles(e.dataTransfer.files);
             }}
             onClick={() => fileInputRef.current?.click()}
-            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-center hover:border-primary/60 ${isMobile ? "py-6" : "py-10"
-              }`}
+            className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border text-center hover:border-primary/60 transition-colors ${
+              isMobile ? "py-6" : "py-10"
+            }`}
           >
             <Upload size={20} className="text-text-secondary" />
             <p className="text-sm text-text-secondary">
@@ -151,27 +167,27 @@ export default function BodyTab({ body, onChange, isMobile = false }: Props) {
             />
           </div>
 
-          {!!body.files?.length && (
+          {!!safeBody.files?.length && (
             <div className="mt-3 flex flex-col gap-1.5">
-              {body.files.map((f) => (
+              {safeBody.files.map((f) => (
                 <div
                   key={f.id}
                   className="flex items-center gap-2 rounded-md border border-border bg-panel px-3 py-2 text-sm"
                 >
                   <FileIcon size={14} className="text-text-secondary" />
                   <span className="truncate text-text-primary">{f.name}</span>
-                  <span className="ml-auto shrink-0 text-xs text-text-muted">
+                  <span className="ml-auto shrink-0 text-xs text-text-muted font-mono">
                     {formatBytes(f.sizeBytes)}
                   </span>
                   <button
                     onClick={() =>
                       onChange({
-                        ...body,
-                        files: body.files?.filter((x) => x.id !== f.id),
+                        ...safeBody,
+                        files: safeBody.files?.filter((x) => x.id !== f.id),
                       })
                     }
                     aria-label={`Remove ${f.name}`}
-                    className="text-text-muted hover:text-error"
+                    className="text-text-muted hover:text-error p-0.5"
                   >
                     <X size={13} />
                   </button>
