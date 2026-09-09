@@ -234,6 +234,7 @@ pub async fn duplicate_request(
 /// ```ignore
 /// save_request(state, request).await?;
 /// ```
+#[tauri::command]
 pub async fn save_request(state: State<'_, AppState>, request: RequestItem) -> AppResult<()> {
     crate::db::collections::save_request(&state.data_dir, &request)?;
     crate::db::app_state::set_active_request(&state.data_dir, Some(&request.id()))?;
