@@ -1,26 +1,28 @@
 import { CookieRow } from "@veyak-internal/models";
 import { Plus, Trash2 } from "lucide-react";
 
-interface Props {
+interface CookiesTabProps {
   rows: CookieRow[];
   onChange: (rows: CookieRow[]) => void;
   isMobile?: boolean;
 }
 
 export default function CookiesTab({
-  rows,
+  rows = [],
   onChange,
   isMobile = false,
-}: Props) {
+}: CookiesTabProps) {
   function update(id: string, patch: Partial<CookieRow>) {
     onChange(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
   }
+
   function addRow() {
     onChange([
       ...rows,
       { id: crypto.randomUUID(), name: "", value: "", domain: "" },
     ]);
   }
+
   function removeRow(id: string) {
     onChange(rows.filter((r) => r.id !== id));
   }
@@ -28,7 +30,7 @@ export default function CookiesTab({
   // ── Mobile: stacked card layout ──
   if (isMobile) {
     return (
-      <div className="px-3 py-2.5">
+      <div className="px-3 py-2.5 h-full overflow-y-auto">
         {rows.length === 0 && (
           <p className="py-4 text-sm text-text-muted">
             No cookies for this request yet.
@@ -47,7 +49,7 @@ export default function CookiesTab({
               <button
                 onClick={() => removeRow(row.id)}
                 aria-label="Remove cookie"
-                className="text-text-muted hover:text-error p-1"
+                className="text-text-muted hover:text-error p-1 cursor-pointer"
               >
                 <Trash2 size={13} />
               </button>
@@ -75,7 +77,7 @@ export default function CookiesTab({
 
         <button
           onClick={addRow}
-          className="mt-1 flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary"
+          className="mt-1 flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary cursor-pointer"
         >
           <Plus size={13} />
           Add cookie
@@ -86,7 +88,7 @@ export default function CookiesTab({
 
   // ── Desktop: original grid ──
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 py-3 h-full overflow-y-auto">
       <div className="grid grid-cols-[1fr_1fr_1fr_28px] gap-2 border-b border-border pb-2 text-[11px] font-medium tracking-wide text-text-muted">
         <span>NAME</span>
         <span>VALUE</span>
@@ -102,22 +104,25 @@ export default function CookiesTab({
           <input
             value={row.name}
             onChange={(e) => update(row.id, { name: e.target.value })}
+            placeholder="Name"
             className="bg-transparent font-mono text-sm text-text-primary outline-none"
           />
           <input
             value={row.value}
             onChange={(e) => update(row.id, { value: e.target.value })}
+            placeholder="Value"
             className="bg-transparent font-mono text-sm text-text-primary outline-none"
           />
           <input
             value={row.domain}
             onChange={(e) => update(row.id, { domain: e.target.value })}
+            placeholder="Domain"
             className="bg-transparent font-mono text-sm text-text-primary outline-none"
           />
           <button
             onClick={() => removeRow(row.id)}
             aria-label="Remove cookie"
-            className="text-text-muted hover:text-error"
+            className="text-text-muted hover:text-error cursor-pointer"
           >
             <Trash2 size={13} />
           </button>
@@ -132,7 +137,7 @@ export default function CookiesTab({
 
       <button
         onClick={addRow}
-        className="mt-2 flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary"
+        className="mt-2 flex items-center gap-1.5 text-sm text-text-secondary hover:text-text-primary cursor-pointer"
       >
         <Plus size={13} />
         Add cookie
