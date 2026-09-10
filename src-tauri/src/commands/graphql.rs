@@ -1,4 +1,4 @@
-use crate::state::AppState;
+use crate::{db, state::AppState};
 use std::collections::BTreeMap;
 use tauri::{command, AppHandle, Emitter, Manager, State, Window};
 use veyak_error::AppResult;
@@ -116,6 +116,9 @@ pub async fn graphql_subscribe(
     window: Window,
     request: GraphQlRequest,
 ) -> AppResult<String> {
+    let dd = &state.data_dir;
+
+    let settings = db::settings::get_settings(dd)?;
     let mut headers = rows_to_map(&request.headers);
     apply_auth_headers(&request.auth, &mut headers);
 
@@ -131,6 +134,7 @@ pub async fn graphql_subscribe(
         variables,
         request.operation_name,
         headers,
+        settings,
     )
     .await?;
 
