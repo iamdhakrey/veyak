@@ -24,7 +24,8 @@
 
 *Veyak API Client* is engineered for seamless, frictionless communication between clients and modern APIs.
 
-<img width="1198" height="830" alt="image" src="https://github.com/user-attachments/assets/f2e6c1d5-4a8f-4d05-a6fc-5000afe164e7" />
+<img width="1917" height="1080" alt="image" src="https://github.com/user-attachments/assets/4c71d4ee-7507-4fbe-a2ff-3fee55f5e4e4" />
+
 
 
 ---
