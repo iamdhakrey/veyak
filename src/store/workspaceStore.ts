@@ -74,6 +74,7 @@ export interface WorkspaceStore {
   ) => Promise<void>;
   deleteRequest: (requestId: string) => Promise<void>;
   renameRequest: (id: string, name: string) => Promise<void>;
+  cloneRequest: (requestId: string) => Promise<void>;
 
   fetchEnvironments: (workspaceid: string) => Promise<void>;
   createEnvironment: (workspaceid: string, name: string) => Promise<void>;
@@ -568,6 +569,20 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       }
     } catch (err) {
       console.error("Error deleting request:", err);
+      set({ error: String(err), isLoadingCollectionTree: false });
+    }
+  },
+
+  cloneRequest: async (id: string) => {
+    const { activeCollectionId } = get();
+    set({ isLoadingCollectionTree: true });
+    try {
+      await invoke("duplicate_request", { requestid: id });
+      if (activeCollectionId) {
+        await get().fetchCollectionTree(activeCollectionId);
+      }
+    } catch (err) {
+      console.error("Error cloning request:", err);
       set({ error: String(err), isLoadingCollectionTree: false });
     }
   },

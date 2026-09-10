@@ -16,11 +16,14 @@ import {
   Check,
   Loader2,
   SlidersHorizontal,
+  History,
+  Settings,
 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useVartaStore } from "../store/vartaStore";
 import { useWorkspaceStore } from "../store/workspaceStore";
 import { UserProfileMenu } from "./UserProfileMenu";
+import { useSettingsStore } from "../store/settingStore";
 
 const appWindow = getCurrentWindow();
 const isMac =
@@ -33,6 +36,10 @@ export default function Titlebar() {
   const activeTab = useVartaStore((s) => s.activeTab);
   const toggleCommandPalette = useVartaStore((s) => s.toggleCommandPalette);
   const openEnvEditor = useVartaStore((s) => s.openEnvEditor);
+  const toggleHistory = useVartaStore((s) => s.toggleHistory);
+  const setSettingsOpen = useSettingsStore((s) => s.setSettingsOpen);
+
+
 
   // Store states
   const {
@@ -784,6 +791,21 @@ export default function Titlebar() {
 
       {/* ── Right Section: User Profile, Status Pill & Window Controls (Windows/Linux) ── */}
       <div className="flex items-center gap-2" data-tauri-drag-region>
+        <button
+          onClick={() => toggleHistory()}
+          className="rounded-md p-1.5 text-text-secondary hover:bg-panel-raised hover:text-text-primary"
+          aria-label="History"
+        >
+          <History size={15} />
+        </button>
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="rounded-md p-1.5 text-text-secondary hover:bg-panel-raised hover:text-text-primary"
+          aria-label="Settings"
+        >
+          <Settings size={15} />
+        </button>
+
         {/* User Login / Profile Menu */}
         <UserProfileMenu />
 

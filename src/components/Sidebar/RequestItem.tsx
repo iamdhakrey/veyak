@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MethodStyles } from "../../types";
-import { Check, Edit2, MoreHorizontal, Trash2, X } from "lucide-react";
+import { Check, Copy, Edit2, MoreHorizontal, Trash2, X } from "lucide-react";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 import { useVartaStore } from "../../store/vartaStore";
 import { RequestItem as Item } from "@veyak-internal/models";
 
 export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
-  const { deleteRequest, renameRequest } = useWorkspaceStore();
+  const { deleteRequest, renameRequest, cloneRequest } = useWorkspaceStore();
   const activeTabId = useVartaStore((s) => s.activeTabId);
   const closeTab = useVartaStore((s) => s.closeTab);
   const openRequestTab = useVartaStore((s) => s.openRequest);
@@ -42,6 +42,13 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
     closeTab(request.id);
   };
 
+  const handleCloneRequest = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMenuOpen(false);
+    await cloneRequest(request.id);
+    closeTab(request.id);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -61,13 +68,12 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
             className="flex items-center gap-2 w-full"
           >
             <span
-              className={`text-[10px] font-bold w-10 text-right shrink-0 ${
-                request.type === "grpc"
-                  ? "text-method-grpc"
-                  : request.type === "graphql"
-                    ? "text-method-graphql"
-                    : MethodStyles[request.method as string] || "text-text-muted"
-              }`}
+              className={`text-[10px] font-bold w-10 text-right shrink-0 ${request.type === "grpc"
+                ? "text-method-grpc"
+                : request.type === "graphql"
+                  ? "text-method-graphql"
+                  : MethodStyles[request.method as string] || "text-text-muted"
+                }`}
             >
               {request.type === "grpc"
                 ? "gRPC"
@@ -114,21 +120,19 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
         <div
           // Trigger the open action when the row is clicked
           onClick={() => openRequestTab(request)}
-          className={`group flex items-center justify-between px-2 py-1.5 mx-1 my-0.5 rounded-md text-sm cursor-pointer hover:bg-panel hover:text-text-primary text-text-secondary transition-colors relative ${
-            activeTabId === request.id
-              ? "border-2 border-primary/10"
-              : "border border-transparent"
-          }`}
+          className={`group flex items-center justify-between px-2 py-1.5 mx-1 my-0.5 rounded-md text-sm cursor-pointer hover:bg-panel hover:text-text-primary text-text-secondary transition-colors relative ${activeTabId === request.id
+            ? "border-2 border-primary/10"
+            : "border border-transparent"
+            }`}
         >
           <div className="flex items-center gap-2.5 truncate transition-colors">
             <span
-              className={`text-[10px] font-bold w-10 text-right shrink-0 ${
-                request.type === "grpc"
-                  ? "text-method-grpc"
-                  : request.type === "graphql"
-                    ? "text-method-graphql"
-                    : MethodStyles[request.method as string] || "text-text-muted"
-              }`}
+              className={`text-[10px] font-bold w-10 text-right shrink-0 ${request.type === "grpc"
+                ? "text-method-grpc"
+                : request.type === "graphql"
+                  ? "text-method-graphql"
+                  : MethodStyles[request.method as string] || "text-text-muted"
+                }`}
             >
               {request.type === "grpc"
                 ? "gRPC"
@@ -142,9 +146,8 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
           {/* Hover Actions (Options Dropdown) */}
           <div
             ref={menuRef}
-            className={`flex items-center transition-opacity pr-1 ${
-              isMenuOpen ? "opacity-100" : "opacity-70 group-hover:opacity-100"
-            }`}
+            className={`flex items-center transition-opacity pr-1 ${isMenuOpen ? "opacity-100" : "opacity-70 group-hover:opacity-100"
+              }`}
           >
             <div className="relative">
               <button
@@ -164,6 +167,13 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
                   onClick={(e) => e.stopPropagation()} // Prevent opening request tab when clicking menu surface
                   className="absolute right-0 top-full mt-1 w-45 py-1 z-50 bg-panel-raised border border-border shadow-elevated rounded-md animate-in fade-in zoom-in-95 duration-100"
                 >
+                  <button
+                    onClick={handleCloneRequest}
+                    className="flex items-center gap-2 w-full px-3 py-1.5 text-xs text-text-secondary hover:bg-panel hover:text-text-primary transition-colors cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    Duplicate
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -189,7 +199,8 @@ export const RequestItem: React.FC<{ request: Item }> = ({ request }) => {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 };
