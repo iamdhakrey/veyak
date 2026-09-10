@@ -19,8 +19,8 @@ pub type PkceSessionState = Arc<Mutex<Option<PkceSession>>>;
 ///
 /// Validates stored tokens and refetches user info if needed.
 #[command]
-pub async fn get_current_user(state: State<'_, AppState>) -> AppResult<Option<User>> {
-    let auth_state = auth_core::load_auth_state(&state.data_dir)?;
+pub async fn get_current_user() -> AppResult<Option<User>> {
+    let auth_state = auth_core::load_auth_state()?;
     match (&auth_state.user, &auth_state.tokens) {
         (Some(user), Some(tokens)) if auth_core::is_token_valid(tokens) => Ok(Some(user.clone())),
         (_, Some(tokens)) if auth_core::is_token_valid(tokens) => {
@@ -31,7 +31,7 @@ pub async fn get_current_user(state: State<'_, AppState>) -> AppResult<Option<Us
                         user: Some(user.clone()),
                         tokens: Some(tokens.clone()),
                     };
-                    auth_core::save_auth_state(&state.data_dir, &new_state)?;
+                    auth_core::save_auth_state(&new_state)?;
                     Ok(Some(user))
                 }
                 Err(_) => Ok(None),
@@ -43,8 +43,8 @@ pub async fn get_current_user(state: State<'_, AppState>) -> AppResult<Option<Us
 
 /// Returns the current access token if valid.
 #[command]
-pub async fn get_access_token(state: State<'_, AppState>) -> AppResult<Option<String>> {
-    let auth_state = auth_core::load_auth_state(&state.data_dir)?;
+pub async fn get_access_token() -> AppResult<Option<String>> {
+    let auth_state = auth_core::load_auth_state()?;
     match auth_state.tokens {
         Some(tokens) if auth_core::is_token_valid(&tokens) => Ok(Some(tokens.access_token)),
         _ => Ok(None),
@@ -53,8 +53,8 @@ pub async fn get_access_token(state: State<'_, AppState>) -> AppResult<Option<St
 
 /// Returns whether the user is currently authenticated.
 #[command]
-pub async fn is_authenticated(state: State<'_, AppState>) -> AppResult<bool> {
-    let auth_state = auth_core::load_auth_state(&state.data_dir)?;
+pub async fn is_authenticated() -> AppResult<bool> {
+    let auth_state = auth_core::load_auth_state()?;
     match auth_state.tokens {
         Some(tokens) => Ok(auth_core::is_token_valid(&tokens)),
         None => Ok(false),
@@ -63,8 +63,8 @@ pub async fn is_authenticated(state: State<'_, AppState>) -> AppResult<bool> {
 
 /// Returns the stored auth state (tokens + user).
 #[command]
-pub async fn get_auth_state(state: State<'_, AppState>) -> AppResult<AuthState> {
-    auth_core::load_auth_state(&state.data_dir)
+pub async fn get_auth_state() -> AppResult<AuthState> {
+    auth_core::load_auth_state()
 }
 
 /// Initiates the login flow.
@@ -105,7 +105,6 @@ pub async fn auth_start_login(
 /// tokens, fetches user info, and persists everything.
 #[command]
 pub async fn auth_handle_callback(
-    state: State<'_, AppState>,
     pkce_state: State<'_, PkceSessionState>,
     callback_url: String,
 ) -> AppResult<AuthState> {
@@ -159,15 +158,15 @@ pub async fn auth_handle_callback(
         user: Some(user),
         tokens: Some(tokens),
     };
-    auth_core::save_auth_state(&state.data_dir, &auth_state)?;
+    auth_core::save_auth_state(&auth_state)?;
 
     Ok(auth_state)
 }
 
 /// Logs out the user: revokes the token remotely, clears local state.
 #[command]
-pub async fn auth_logout(state: State<'_, AppState>) -> AppResult<String> {
-    let auth_state = auth_core::load_auth_state(&state.data_dir)?;
+pub async fn auth_logout() -> AppResult<String> {
+    let auth_state = auth_core::load_auth_state()?;
 
     // Try to revoke remotely (ignore errors)
     if let Some(tokens) = &auth_state.tokens {
@@ -175,7 +174,7 @@ pub async fn auth_logout(state: State<'_, AppState>) -> AppResult<String> {
     }
 
     // Clear local state
-    auth_core::clear_auth_state(&state.data_dir)?;
+    auth_core::clear_auth_state()?;
 
     // Return the Auth0 logout URL for the frontend to open
     let logout_url = format!(
