@@ -87,9 +87,17 @@ export default function UnifiedAddressBar({
   );
   const activeGqlOp =
     docOperations.find((o) => o.name === gqlOpName) ?? docOperations[0];
+
+  const isSubscriptionQuery = (rawQuery?: string): boolean => {
+    if (!rawQuery) return false;
+    // Matches leading comments, whitespace, then "subscription" operation keyword
+    return /^\s*(?:#[^\r\n]*[\r\n]+)*\s*subscription\b/i.test(rawQuery);
+  };
+  const rawQuery = (tab.request as any)?.query;
+
   const isGqlSubscription = activeGqlOp
     ? activeGqlOp.type === "subscription"
-    : (tab.request as any).requestType === "subscription";
+    : (tab.request as any)?.requestType === "subscription" || isSubscriptionQuery(rawQuery);
 
   // REST Methods
   const httpMethods: HttpMethod[] = [
@@ -166,9 +174,8 @@ export default function UnifiedAddressBar({
         <div className="flex items-center gap-1.5">
           <span className="input-shell flex items-center gap-1.5 font-semibold text-method-ws px-3 py-1.5 text-sm cursor-default select-none">
             <span
-              className={`inline-block h-2 w-2 rounded-full ${
-                wsConnected ? "bg-method-ws animate-pulse" : "bg-method-ws/50"
-              }`}
+              className={`inline-block h-2 w-2 rounded-full ${wsConnected ? "bg-method-ws animate-pulse" : "bg-method-ws/50"
+                }`}
             />
             WS
           </span>
@@ -176,11 +183,10 @@ export default function UnifiedAddressBar({
             <div className="flex items-center rounded border border-border bg-panel p-0.5">
               <button
                 onClick={() => setWsProtocol("raw")}
-                className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
-                  tab.wsProtocol !== "graphql-ws"
-                    ? "bg-primary/20 text-primary"
-                    : "text-text-muted hover:text-text-secondary"
-                }`}
+                className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${tab.wsProtocol !== "graphql-ws"
+                  ? "bg-primary/20 text-primary"
+                  : "text-text-muted hover:text-text-secondary"
+                  }`}
                 title="Raw WebSocket Frames"
               >
                 <Globe size={10} />
@@ -188,11 +194,10 @@ export default function UnifiedAddressBar({
               </button>
               <button
                 onClick={() => setWsProtocol("graphql-ws")}
-                className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${
-                  tab.wsProtocol === "graphql-ws"
-                    ? "bg-primary/20 text-primary"
-                    : "text-text-muted hover:text-text-secondary"
-                }`}
+                className={`flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium transition-colors ${tab.wsProtocol === "graphql-ws"
+                  ? "bg-primary/20 text-primary"
+                  : "text-text-muted hover:text-text-secondary"
+                  }`}
                 title="GraphQL WebSocket Transport"
               >
                 <Zap size={10} />
@@ -208,9 +213,8 @@ export default function UnifiedAddressBar({
       return (
         <span className="input-shell flex items-center gap-1.5 font-semibold text-method-grpc px-3 py-1.5 text-sm cursor-default select-none">
           <span
-            className={`inline-block h-2 w-2 rounded-full ${
-              grpcActive ? "bg-method-grpc animate-pulse" : "bg-method-grpc/70"
-            }`}
+            className={`inline-block h-2 w-2 rounded-full ${grpcActive ? "bg-method-grpc animate-pulse" : "bg-method-grpc/70"
+              }`}
           />
           gRPC
         </span>
@@ -221,9 +225,8 @@ export default function UnifiedAddressBar({
       return (
         <span className="input-shell flex items-center gap-1.5 font-semibold text-method-graphql px-3 py-1.5 text-sm cursor-default select-none">
           <span
-            className={`inline-block h-2 w-2 rounded-full ${
-              gqlActive ? "bg-method-graphql animate-pulse" : "bg-method-graphql/70"
-            }`}
+            className={`inline-block h-2 w-2 rounded-full ${gqlActive ? "bg-method-graphql animate-pulse" : "bg-method-graphql/70"
+              }`}
           />
           GQL
         </span>
@@ -236,9 +239,8 @@ export default function UnifiedAddressBar({
         <select
           value={tab.request.method}
           onChange={(e) => handleRestMethodChange(e.target.value as HttpMethod)}
-          className={`input-shell appearance-none pr-7 font-semibold ${
-            MethodStyles[tab.request.method as HttpMethod] || "text-text-primary"
-          }`}
+          className={`input-shell appearance-none pr-7 font-semibold ${MethodStyles[tab.request.method as HttpMethod] || "text-text-primary"
+            }`}
         >
           {httpMethods.map((m) => (
             <option key={m} value={m} className="bg-panel text-text-primary">
@@ -267,11 +269,10 @@ export default function UnifiedAddressBar({
           {/* TLS Toggle */}
           <button
             onClick={() => setTlsEnabled(!tlsEnabled)}
-            className={`flex items-center gap-1 rounded-md border px-2 py-1.5 text-xs font-medium transition-all ${
-              tlsEnabled
-                ? "border-success/40 bg-success/10 text-success shadow-[0_0_8px_rgba(16,185,129,0.15)]"
-                : "border-border bg-panel text-text-muted hover:text-text-secondary"
-            }`}
+            className={`flex items-center gap-1 rounded-md border px-2 py-1.5 text-xs font-medium transition-all ${tlsEnabled
+              ? "border-success/40 bg-success/10 text-success shadow-[0_0_8px_rgba(16,185,129,0.15)]"
+              : "border-border bg-panel text-text-muted hover:text-text-secondary"
+              }`}
             title={tlsEnabled ? "TLS enabled — click to disable" : "TLS disabled — click to enable"}
           >
             {tlsEnabled ? <Lock size={12} /> : <LockOpen size={12} />}

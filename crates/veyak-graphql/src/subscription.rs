@@ -1,13 +1,21 @@
 use futures_util::{SinkExt, StreamExt};
-use std::collections::BTreeMap;
+use rustls::{
+    client::danger::{HandshakeSignatureValid, ServerCertVerifier},
+    pki_types::{CertificateDer, ServerName, UnixTime},
+    ClientConfig,
+};
+use rustls::{Error, SignatureScheme};
+use std::{collections::BTreeMap, sync::Arc};
 use tokio::sync::mpsc;
 use tokio_tungstenite::{
     connect_async_tls_with_config,
     tungstenite::{client::IntoClientRequest as _, Message},
+    Connector,
 };
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 use veyak_error::{AppError, AppResult};
+use veyak_models::AppSettings;
 
 /// Event sent from the subscription read loop to the Tauri command layer.
 #[derive(Debug, Clone)]
@@ -21,6 +29,66 @@ pub struct SubscriptionHandle {
     pub connection_id: String,
     pub cancel_token: CancellationToken,
     pub rx: mpsc::UnboundedReceiver<GraphQlEvent>,
+}
+
+#[derive(Debug)]
+struct NoCertificateVerification;
+
+impl ServerCertVerifier for NoCertificateVerification {
+    fn verify_server_cert(
+        &self,
+        _end_entity: &CertificateDer<'_>,
+        _intermediates: &[CertificateDer<'_>],
+        _server_name: &ServerName<'_>,
+        _ocsp_response: &[u8],
+        _now: UnixTime,
+    ) -> Result<rustls::client::danger::ServerCertVerified, Error> {
+        Ok(rustls::client::danger::ServerCertVerified::assertion())
+    }
+
+    fn verify_tls12_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn verify_tls13_signature(
+        &self,
+        _message: &[u8],
+        _cert: &CertificateDer<'_>,
+        _dss: &rustls::DigitallySignedStruct,
+    ) -> Result<HandshakeSignatureValid, Error> {
+        Ok(HandshakeSignatureValid::assertion())
+    }
+
+    fn supported_verify_schemes(&self) -> Vec<SignatureScheme> {
+        rustls::crypto::aws_lc_rs::default_provider()
+            .signature_verification_algorithms
+            .supported_schemes()
+    }
+}
+
+fn build_ws_client(setting: &AppSettings) -> AppResult<Connector> {
+    let mut config = ClientConfig::builder()
+        .with_root_certificates(rustls::RootCertStore::empty())
+        .with_no_client_auth();
+
+    if !setting.verify_ssl_certificates {
+        config
+            .dangerous()
+            .set_certificate_verifier(Arc::new(NoCertificateVerification));
+    };
+
+    // 3. Wrap it inside tokio_tungstenite's Connector enum
+    let connector = Connector::Rustls(Arc::new(config));
+    Ok(connector)
+}
+
+fn check_is_secure_ws(url: String) -> bool {
+    return url.starts_with("wss");
 }
 
 /// Upgrade a `ws://` or `http://` URL to the appropriate WebSocket scheme.
@@ -48,6 +116,7 @@ pub async fn start_subscription(
     variables: Option<serde_json::Value>,
     operation_name: Option<String>,
     _headers: BTreeMap<String, String>,
+    settings: AppSettings,
 ) -> AppResult<SubscriptionHandle> {
     let ws_url = to_ws_url(endpoint);
     let connection_id = Uuid::new_v4().to_string();
@@ -75,9 +144,25 @@ pub async fn start_subscription(
         .headers_mut()
         .insert("User-Agent", "Veyak/0.1".parse().unwrap());
 
-    let (ws_stream, _) = connect_async_tls_with_config(request, None, false, None)
+    let connector = build_ws_client(&settings)?;
+    let (ws_stream, _) = if check_is_secure_ws(ws_url.clone()) {
+        connect_async_tls_with_config(
+            request,
+            None,  // Use default WebSocketConfig
+            false, // Do not disable Nagle's algorithm
+            Some(connector),
+        )
         .await
-        .map_err(|e| AppError::GraphQlError(format!("WebSocket connection failed: {e}")))?;
+        .map_err(|e| AppError::WebSocket(format!("TLS connection failed: {e}")))?
+    } else {
+        tokio_tungstenite::connect_async(request)
+            .await
+            .map_err(|e| AppError::WebSocket(format!("connection failed: {e}")))?
+    };
+
+    // let (ws_stream, _) = connect_async_tls_with_config(request, None, false, None)
+    //     .await
+    //     .map_err(|e| AppError::GraphQlError(format!("WebSocket connection failed: {e}")))?;
 
     let (mut write, mut read) = ws_stream.split();
 
