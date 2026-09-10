@@ -12,7 +12,7 @@ import { SettingsPanel } from "./components/SettingsPanel";
 import { EnvironmentModal } from "./components/EnvironmentModal";
 import { Menu } from "lucide-react";
 import { UpdaterOverlay } from "./components/UpdaterOverlay";
-import Titlebar from "./components/TitleBar";
+import Titlebar from "./components/TitleBar/TitleBar";
 import { NewReqSaveModal } from "./components/NewRequestSaveModal";
 
 export default function App() {
