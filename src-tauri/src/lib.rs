@@ -173,6 +173,7 @@ pub fn run() {
             // Themes
             settings::list_themes,
             settings::delete_theme,
+            settings::set_active_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Veyak application");

@@ -16,7 +16,7 @@ import {
   Trash2,
   ExternalLink,
 } from "lucide-react";
-import { AppSettings, Theme } from "@veyak-internal/models";
+import { AppSettings } from "@veyak-internal/models";
 import { invoke } from "@tauri-apps/api/core";
 import { useThemeStore } from "../store/themeStore";
 
@@ -362,7 +362,6 @@ const GeneralTab: React.FC<GeneralTabProps> = ({
   );
 };
 
-
 // ─── Shortcuts Tab ───────────────────────────────────────────────────────────
 
 const ShortcutsTab: React.FC<{ isMobile?: boolean }> = ({
@@ -452,7 +451,9 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   </label>
 );
 
-export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
+export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
+  isMobile = false,
+}) => {
   // Font Store
   const settingsFont = useSettingsStore((s) => s.settings?.font);
   const font = settingsFont || DEFAULT_FONT_SETTINGS;
@@ -467,11 +468,15 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
     enableLigatures,
   } = font;
 
-  const setAppFontFamily = (family: string) => updateFontSettings({ appFontFamily: family });
-  const setFontFamily = (family: string) => updateFontSettings({ fontFamily: family, customFontPath: null });
-  const setLigatures = (enable: boolean) => updateFontSettings({ enableLigatures: enable });
+  const setAppFontFamily = (family: string) =>
+    updateFontSettings({ appFontFamily: family });
+  const setFontFamily = (family: string) =>
+    updateFontSettings({ fontFamily: family, customFontPath: null });
+  const setLigatures = (enable: boolean) =>
+    updateFontSettings({ enableLigatures: enable });
   const setFontSize = (size: number) => updateFontSettings({ fontSize: size });
-  const setLineHeight = (height: number) => updateFontSettings({ lineHeight: height });
+  const setLineHeight = (height: number) =>
+    updateFontSettings({ lineHeight: height });
 
   const [availableFonts, setAvailableFonts] = useState<string[]>([]);
   const [isLoadingFonts, setIsLoadingFonts] = useState(true);
@@ -484,7 +489,6 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
   const openThemesFolder = useThemeStore((s) => s.openThemesFolder);
   const deleteCustomTheme = useThemeStore((s) => s.deleteCustomTheme);
   const fetchThemes = useThemeStore((s) => s.fetchThemes);
-
 
   useEffect(() => {
     console.log("appearance themes updated:", themes);
@@ -509,13 +513,9 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-
-  const selectedTheme = activeTheme || themes.find((t) => t.id === activeThemeId) || themes[0];
-  const isBuiltin =
-    selectedTheme?.id?.startsWith("builtin-") ||
-    selectedTheme?.id === "vscode-dark-plus" ||
-    selectedTheme?.id === "github-dark";
+  const selectedTheme =
+    activeTheme || themes.find((t) => t.id === activeThemeId) || themes[0];
+  const isBuiltin = selectedTheme?.isBuiltin;
 
   return (
     <div className={`flex flex-col gap-6 ${isMobile ? "p-4" : "p-6"}`}>
@@ -526,7 +526,6 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
             Theme
           </h3>
           <div className="flex items-center gap-1.5">
-
             <button
               onClick={() => openThemesFolder()}
               className="flex items-center gap-1 text-xs text-text-secondary bg-panel hover:bg-borderMuted hover:text-text-primary px-2.5 py-1.5 rounded-md border border-border transition-colors cursor-pointer"
@@ -575,17 +574,23 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
                 />
                 <span
                   className="w-3.5 h-3.5 rounded-full border border-white/10"
-                  style={{ backgroundColor: selectedTheme.tokens.ui.colorPanel }}
+                  style={{
+                    backgroundColor: selectedTheme.tokens.ui.colorPanel,
+                  }}
                   title={`Panel: ${selectedTheme.tokens.ui.colorPanel}`}
                 />
                 <span
                   className="w-3.5 h-3.5 rounded-full border border-white/10"
-                  style={{ backgroundColor: selectedTheme.tokens.ui.colorPrimary }}
+                  style={{
+                    backgroundColor: selectedTheme.tokens.ui.colorPrimary,
+                  }}
                   title={`Primary: ${selectedTheme.tokens.ui.colorPrimary}`}
                 />
                 <span
                   className="w-3.5 h-3.5 rounded-full border border-white/10"
-                  style={{ backgroundColor: selectedTheme.tokens.syntax.keyword }}
+                  style={{
+                    backgroundColor: selectedTheme.tokens.syntax.keyword,
+                  }}
                   title={`Keyword: ${selectedTheme.tokens.syntax.keyword}`}
                 />
               </div>
@@ -602,11 +607,22 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
               }}
             >
               <div>
-                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>const</span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.property }}>cluster</span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.operator }}>=</span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>await</span>{" "}
-                <span style={{ color: selectedTheme.tokens.ui.methodGet }}>getClusterNodes</span>();
+                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>
+                  const
+                </span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.property }}>
+                  cluster
+                </span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.operator }}>
+                  =
+                </span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>
+                  await
+                </span>{" "}
+                <span style={{ color: selectedTheme.tokens.ui.methodGet }}>
+                  getClusterNodes
+                </span>
+                ();
               </div>
               <div>
                 <span style={{ color: selectedTheme.tokens.syntax.comment }}>
@@ -702,7 +718,9 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = fal
           </select>
         </div>
 
-        <div className={`flex items-center gap-4 ${isMobile ? "flex-wrap" : ""}`}>
+        <div
+          className={`flex items-center gap-4 ${isMobile ? "flex-wrap" : ""}`}
+        >
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-sm font-medium text-text-primary">
               Font Size (px)

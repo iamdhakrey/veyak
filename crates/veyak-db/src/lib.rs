@@ -396,8 +396,6 @@ fn default_themes() -> Vec<Theme> {
                     method_graphql: "#E30372".to_string(),
                     radius_md: "8px".to_string(),
                     radius_lg: "10px".to_string(),
-                    font_sans: "Inter, ui-sans-serif, system-ui".to_string(),
-                    font_mono: "JetBrains Mono, ui-monospace, monospace".to_string(),
                 },
                 syntax: ThemeSyntax {
                     keyword: "#FF7B72".to_string(),
@@ -455,9 +453,6 @@ fn default_themes() -> Vec<Theme> {
                     method_graphql: "#E06C75".to_string(),
                     radius_md: "4px".to_string(),
                     radius_lg: "6px".to_string(),
-                    font_sans: "Segoe UI, -apple-system, BlinkMacSystemFont, Roboto, sans-serif"
-                        .to_string(),
-                    font_mono: "Consolas, Menlo, Monaco, 'Courier New', monospace".to_string(),
                 },
                 syntax: ThemeSyntax {
                     keyword: "#C586C0".to_string(),

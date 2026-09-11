@@ -20,13 +20,11 @@ pub fn list_themes(dd: &DataDir) -> AppResult<Vec<Theme>> {
             .cmp(&a.is_builtin)
             .then_with(|| a.name.cmp(&b.name))
     });
-    println!("list themes from db folder {:?}", themes);
     Ok(themes)
 }
 
 pub fn get_theme(dd: &DataDir, id: &str) -> AppResult<Theme> {
     let themes = list_themes(dd)?;
-    println!("themes {:?}", themes);
     themes
         .into_iter()
         .find(|t| t.id == id)

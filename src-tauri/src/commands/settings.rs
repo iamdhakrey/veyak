@@ -24,3 +24,8 @@ pub async fn list_themes(state: State<'_, AppState>) -> AppResult<Vec<Theme>> {
 pub async fn delete_theme(state: State<'_, AppState>, id: String) -> AppResult<()> {
     crate::db::themes::delete_theme(&state.data_dir, &id)
 }
+
+#[tauri::command]
+pub async fn set_active_theme(state: State<'_, AppState>, id: String) -> AppResult<()> {
+    crate::db::app_state::set_active_theme(&state.data_dir, &id)
+}

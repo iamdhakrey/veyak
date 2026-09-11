@@ -521,8 +521,6 @@ pub struct ThemeUI {
     pub method_graphql: String,
     pub radius_md: String,
     pub radius_lg: String,
-    pub font_sans: String,
-    pub font_mono: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
@@ -630,7 +628,8 @@ pub struct PluginRecord {
 // Active app state (last-selected workspace / environment / theme)
 // ---------------------------------------------------------------------
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[ts(export, export_to = "models.ts")]
 #[serde(rename_all = "camelCase")]
 pub struct ActiveState {
     pub active_workspace_id: Option<String>,
