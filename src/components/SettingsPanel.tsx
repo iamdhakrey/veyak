@@ -12,9 +12,13 @@ import {
   Keyboard,
   CornerDownLeft,
   Type,
+  FolderOpen,
+  Trash2,
+  ExternalLink,
 } from "lucide-react";
-import { AppSettings } from "@veyak-internal/models";
+import { AppSettings, Theme } from "@veyak-internal/models";
 import { invoke } from "@tauri-apps/api/core";
+import { useThemeStore } from "../store/themeStore";
 
 type SettingsTab = "general" | "appearance" | "shortcuts";
 
@@ -112,8 +116,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
     >
       <div
         className={`relative flex overflow-hidden rounded-xl border border-border bg-bg shadow-elevated animate-in zoom-in-95 duration-200 ${isMobile
-            ? "w-[95vw] h-[90vh] flex-col"
-            : "w-full max-w-3xl h-[78vh] flex-row"
+          ? "w-[95vw] h-[90vh] flex-col"
+          : "w-full max-w-3xl h-[78vh] flex-row"
           }`}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -126,8 +130,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer ${activeTab === tab.id
-                      ? "bg-primary/15 text-primary"
-                      : "text-text-secondary hover:bg-borderMuted hover:text-text-primary"
+                    ? "bg-primary/15 text-primary"
+                    : "text-text-secondary hover:bg-borderMuted hover:text-text-primary"
                     }`}
                 >
                   {tab.icon}
@@ -154,8 +158,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition-colors cursor-pointer text-left ${activeTab === tab.id
-                    ? "bg-primary/15 text-primary"
-                    : "text-text-secondary hover:bg-borderMuted hover:text-text-primary"
+                  ? "bg-primary/15 text-primary"
+                  : "text-text-secondary hover:bg-borderMuted hover:text-text-primary"
                   }`}
               >
                 {tab.icon}
@@ -434,8 +438,8 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
       />
       <div
         className={`w-9 h-5 rounded-full border transition-colors cursor-pointer ${checked
-            ? "bg-primary border-primary"
-            : "bg-panel-raised border-border"
+          ? "bg-primary border-primary"
+          : "bg-panel-raised border-border"
           }`}
         onClick={() => onChange(!checked)}
       >
@@ -448,11 +452,11 @@ const ToggleRow: React.FC<ToggleRowProps> = ({
   </label>
 );
 
-
-const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
-  const settingsFont = useSettingsStore(s => s.settings?.font);
+export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) => {
+  // Font Store
+  const settingsFont = useSettingsStore((s) => s.settings?.font);
   const font = settingsFont || DEFAULT_FONT_SETTINGS;
-  const updateFontSettings = useSettingsStore(s => s.updateFontSettings);
+  const updateFontSettings = useSettingsStore((s) => s.updateFontSettings);
 
   const {
     appFontFamily,
@@ -460,7 +464,7 @@ const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) =
     customFontPath,
     fontSize,
     lineHeight,
-    enableLigatures
+    enableLigatures,
   } = font;
 
   const setAppFontFamily = (family: string) => updateFontSettings({ appFontFamily: family });
@@ -472,12 +476,27 @@ const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) =
   const [availableFonts, setAvailableFonts] = useState<string[]>([]);
   const [isLoadingFonts, setIsLoadingFonts] = useState(true);
 
-  // Fetch installed system fonts from Tauri backend
+  // Theme Store
+  const themes = useThemeStore((s) => s.themes);
+  const activeThemeId = useThemeStore((s) => s.activeThemeId);
+  const activeTheme = useThemeStore((s) => s.activeTheme);
+  const setActiveThemeId = useThemeStore((s) => s.setActiveThemeId);
+  const openThemesFolder = useThemeStore((s) => s.openThemesFolder);
+  const deleteCustomTheme = useThemeStore((s) => s.deleteCustomTheme);
+  const fetchThemes = useThemeStore((s) => s.fetchThemes);
+
+
   useEffect(() => {
+    console.log("appearance themes updated:", themes);
+  }, [themes]);
+  // Mount effect: only fetch if not already loaded, run once
+  useEffect(() => {
+    fetchThemes();
+
     const fetchFonts = async () => {
       try {
         setIsLoadingFonts(true);
-        const fonts = await invoke<string[]>('get_system_fonts');
+        const fonts = await invoke<string[]>("get_system_fonts");
         setAvailableFonts(fonts);
       } catch (error) {
         console.error("Failed to load system fonts:", error);
@@ -485,114 +504,204 @@ const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) =
         setIsLoadingFonts(false);
       }
     };
+
     fetchFonts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // const handleSelectFontFile = async () => {
-  //   try {
-  //     const selectedPath = await open({
-  //       multiple: false,
-  //       filters: [{ name: 'Fonts', extensions: ['ttf', 'otf', 'woff2'] }]
-  //     });
 
-  //     if (selectedPath && typeof selectedPath === 'string') {
-  //       // Extract a basic name from the path for the CSS rule
-  //       const fontName = selectedPath.split(/[/\\]/).pop()?.split('.')[0] || "CustomFont";
-  //       await loadCustomFont(fontName, selectedPath);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error picking font file:", error);
-  //   }
-  // };
+
+  const selectedTheme = activeTheme || themes.find((t) => t.id === activeThemeId) || themes[0];
+  const isBuiltin =
+    selectedTheme?.id?.startsWith("builtin-") ||
+    selectedTheme?.id === "vscode-dark-plus" ||
+    selectedTheme?.id === "github-dark";
 
   return (
     <div className={`flex flex-col gap-6 ${isMobile ? "p-4" : "p-6"}`}>
+      {/* ── Theme Selection Section ── */}
+      <section className="flex flex-col gap-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-[11px] font-bold tracking-wider text-text-muted uppercase">
+            Theme
+          </h3>
+          <div className="flex items-center gap-1.5">
+
+            <button
+              onClick={() => openThemesFolder()}
+              className="flex items-center gap-1 text-xs text-text-secondary bg-panel hover:bg-borderMuted hover:text-text-primary px-2.5 py-1.5 rounded-md border border-border transition-colors cursor-pointer"
+              title="Open system themes directory"
+            >
+              <FolderOpen className="w-3.5 h-3.5" />
+              <span>Folder</span>
+            </button>
+            {selectedTheme && !isBuiltin && (
+              <button
+                onClick={() => deleteCustomTheme(selectedTheme.id)}
+                className="flex items-center gap-1 text-xs text-error bg-panel hover:bg-error/10 px-2 py-1.5 rounded-md border border-border transition-colors cursor-pointer"
+                title="Delete current custom theme"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Theme Dropdown and Swatch */}
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <select
+                value={activeThemeId}
+                onChange={(e) => setActiveThemeId(e.target.value)}
+                className="input-shell w-full bg-panel text-sm appearance-none pr-8 cursor-pointer"
+              >
+                {themes.map((theme) => (
+                  <option key={theme.id} value={theme.id}>
+                    {theme.name} {theme.author ? `(by ${theme.author})` : ""}
+                  </option>
+                ))}
+              </select>
+              <Palette className="w-4 h-4 text-text-muted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+
+            {/* 4-Color Swatch for active selection */}
+            {selectedTheme && (
+              <div className="flex items-center gap-1 px-2.5 py-2 rounded-md bg-panel border border-border shrink-0">
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-white/10"
+                  style={{ backgroundColor: selectedTheme.tokens.ui.colorBg }}
+                  title={`Background: ${selectedTheme.tokens.ui.colorBg}`}
+                />
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-white/10"
+                  style={{ backgroundColor: selectedTheme.tokens.ui.colorPanel }}
+                  title={`Panel: ${selectedTheme.tokens.ui.colorPanel}`}
+                />
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-white/10"
+                  style={{ backgroundColor: selectedTheme.tokens.ui.colorPrimary }}
+                  title={`Primary: ${selectedTheme.tokens.ui.colorPrimary}`}
+                />
+                <span
+                  className="w-3.5 h-3.5 rounded-full border border-white/10"
+                  style={{ backgroundColor: selectedTheme.tokens.syntax.keyword }}
+                  title={`Keyword: ${selectedTheme.tokens.syntax.keyword}`}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Miniature Editor Preview */}
+          {selectedTheme && (
+            <div
+              className="p-3 rounded-md border border-border/70 font-mono text-xs leading-relaxed"
+              style={{
+                backgroundColor: selectedTheme.tokens.ui.colorBg,
+                borderColor: selectedTheme.tokens.ui.colorBorder,
+              }}
+            >
+              <div>
+                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>const</span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.property }}>cluster</span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.operator }}>=</span>{" "}
+                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>await</span>{" "}
+                <span style={{ color: selectedTheme.tokens.ui.methodGet }}>getClusterNodes</span>();
+              </div>
+              <div>
+                <span style={{ color: selectedTheme.tokens.syntax.comment }}>
+                  // latency: 12.4ms • 200 OK
+                </span>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-1">
+            <a
+              href="https://themes.veyak.iamdhakrey.dev"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-hover hover:underline transition-colors font-medium"
+            >
+              <span>Browse Community Themes</span>
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <div className="h-px bg-borderMuted" />
+
+      {/* ── App Typography ── */}
       <section className="flex flex-col gap-4">
         <h3 className="text-[11px] font-bold tracking-wider text-text-muted uppercase">
           App Typography
         </h3>
 
-        {/* App Font Family Selection */}
         <div className="flex flex-col gap-1.5">
           <label className="flex items-center gap-2 text-sm font-medium text-text-primary">
             <Type className="w-4 h-4 text-text-secondary" />
             App Font Family
           </label>
-          <div className="flex gap-2">
-            <select
-              value={appFontFamily}
-              onChange={(e) => setAppFontFamily(e.target.value)}
-              disabled={isLoadingFonts}
-              className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
-            >
-              {isLoadingFonts ? (
-                <option>Loading system fonts...</option>
-              ) : (
-                availableFonts.map((font) => (
-                  <option key={font} value={font}>
-                    {font}
-                  </option>
-                ))
-              )}
-            </select>
-          </div>
+          <select
+            value={appFontFamily}
+            onChange={(e) => setAppFontFamily(e.target.value)}
+            disabled={isLoadingFonts}
+            className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
+          >
+            {isLoadingFonts ? (
+              <option>Loading system fonts...</option>
+            ) : (
+              availableFonts.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))
+            )}
+          </select>
         </div>
       </section>
 
+      <div className="h-px bg-borderMuted" />
+
+      {/* ── Editor Typography ── */}
       <section className="flex flex-col gap-4">
         <h3 className="text-[11px] font-bold tracking-wider text-text-muted uppercase">
           Editor Typography
         </h3>
 
-        {/* Font Family Selection */}
         <div className="flex flex-col gap-1.5">
           <label className="flex items-center gap-2 text-sm font-medium text-text-primary">
             <Type className="w-4 h-4 text-text-secondary" />
             Font Family
           </label>
-          <div className="flex gap-2">
-            <select
-              value={customFontPath ? "custom" : fontFamily}
-              onChange={(e) => {
-                if (e.target.value !== "custom") {
-                  setFontFamily(e.target.value);
-                }
-              }}
-              disabled={isLoadingFonts}
-              className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
-            >
-              {customFontPath && (
-                <option value="custom" disabled>
-                  {fontFamily} (Custom File)
+          <select
+            value={customFontPath ? "custom" : fontFamily}
+            onChange={(e) => {
+              if (e.target.value !== "custom") {
+                setFontFamily(e.target.value);
+              }
+            }}
+            disabled={isLoadingFonts}
+            className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
+          >
+            {customFontPath && (
+              <option value="custom" disabled>
+                {fontFamily} (Custom File)
+              </option>
+            )}
+            {isLoadingFonts ? (
+              <option>Loading system fonts...</option>
+            ) : (
+              availableFonts.map((f) => (
+                <option key={f} value={f}>
+                  {f}
                 </option>
-              )}
-              {isLoadingFonts ? (
-                <option>Loading system fonts...</option>
-              ) : (
-                availableFonts.map((font) => (
-                  <option key={font} value={font}>
-                    {font}
-                  </option>
-                ))
-              )}
-            </select>
-
-            {/*<button
-              onClick={handleSelectFontFile}
-              title="Load custom font file"
-              className="flex shrink-0 items-center justify-center rounded-md border border-border bg-panel px-3 hover:bg-borderMuted transition-colors"
-            >
-              <FolderOpen className="w-4 h-4 text-text-secondary" />
-            </button>*/}
-          </div>
-          {customFontPath && (
-            <span className="text-xs text-text-muted truncate mt-1">
-              Loaded: {customFontPath}
-            </span>
-          )}
+              ))
+            )}
+          </select>
         </div>
 
-        {/* Font Size & Line Height */}
         <div className={`flex items-center gap-4 ${isMobile ? "flex-wrap" : ""}`}>
           <div className="flex flex-col gap-1.5 flex-1">
             <label className="text-sm font-medium text-text-primary">
@@ -631,21 +740,6 @@ const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({ isMobile = false }) =
           checked={enableLigatures}
           onChange={(v) => setLigatures(v)}
         />
-      </section>
-
-      <div className="h-px bg-borderMuted" />
-
-      {/* Placeholder for future themes */}
-      <section className="flex flex-col gap-4">
-        <h3 className="text-[11px] font-bold tracking-wider text-text-muted uppercase">
-          Theme Customisation
-        </h3>
-        <div className="flex flex-col items-center justify-center p-8 border border-dashed border-border rounded-lg bg-panel-raised/50">
-          <Palette className="w-8 h-8 text-text-muted opacity-40 mb-2" />
-          <p className="text-xs text-text-muted text-center max-w-xs">
-            Custom themes are coming soon. You'll be able to choose from built-in themes or create your own palette.
-          </p>
-        </div>
       </section>
     </div>
   );

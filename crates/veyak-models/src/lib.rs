@@ -495,7 +495,7 @@ impl Default for AppSettings {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
-pub struct ThemeTokens {
+pub struct ThemeUI {
     pub color_bg: String,
     pub color_panel: String,
     pub color_panel_raised: String,
@@ -510,6 +510,15 @@ pub struct ThemeTokens {
     pub color_success: String,
     pub color_error: String,
     pub color_warning: String,
+    pub method_get: String,
+    pub method_post: String,
+    pub method_put: String,
+    pub method_delete: String,
+    pub method_patch: String,
+    pub method_query: String,
+    pub method_ws: String,
+    pub method_grpc: String,
+    pub method_graphql: String,
     pub radius_md: String,
     pub radius_lg: String,
     pub font_sans: String,
@@ -519,9 +528,56 @@ pub struct ThemeTokens {
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
+pub enum ThemeVariant {
+    Dark,
+    Light,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
+pub struct ThemeSyntax {
+    pub comment: String,
+    pub property: String,
+    pub string: String,
+    pub number: String,
+    pub null: String,
+    pub function: String,
+    pub variable: String,
+    pub attribute: String,
+    pub class_name: String,
+    pub boolean: String,
+    pub keyword: String,
+    pub punctuation: String,
+    pub operator: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
+pub struct ThemeTokens {
+    pub ui: ThemeUI,
+    pub syntax: ThemeSyntax,
+}
+
+pub fn default_schema() -> String {
+    "https://veyak.iamdhakrey.dev/schemas/themes/1.0.0.json".to_string()
+}
+#[derive(Debug, Clone, Serialize, Deserialize, TS)]
+#[serde(rename_all = "camelCase")]
+#[ts(export, export_to = "models.ts")]
 pub struct Theme {
+    #[serde(rename = "$schema", default = "default_schema")]
+    pub schema: String,
     pub id: String,
     pub name: String,
+    pub version: String,
+    pub description: String,
+    pub author: String,
+    pub repository: String,
+    pub license: String,
+    pub tags: Vec<String>,
+    pub variant: ThemeVariant,
     pub is_builtin: bool,
     pub tokens: ThemeTokens,
 }

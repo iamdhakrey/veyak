@@ -70,12 +70,14 @@
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #64748b; /* slate-500 */
+  color: var(--syntax-comment, #64748b);
+  /* slate-500 */
   font-style: italic;
 }
 
 .token.punctuation {
-  color: #94a3b8; /* slate-400 */
+  color: var(--syntax-punctuation, #94a3b8);
+  /* slate-400 */
 }
 
 /* JSON Keys & GraphQL Object Fields */
@@ -84,7 +86,8 @@
 .token.constant,
 .token.symbol,
 .token.deleted {
-  color: #38bdf8; /* sky-400 */
+  color: var(--syntax-property, #38bdf8);
+  /* sky-400 */
 }
 
 /* Strings */
@@ -93,22 +96,26 @@
 .token.attr-value,
 .token.builtin,
 .token.inserted {
-  color: #34d399; /* emerald-400 */
+  color: var(--syntax-string, #34d399);
+  /* emerald-400 */
 }
 
 /* Numbers */
 .token.number {
-  color: #fb923c; /* orange-400 */
+  color: var(--syntax-number, #fb923c);
+  /* orange-400 */
 }
 
 /* Booleans & Null */
 .token.boolean {
-  color: #f472b6; /* pink-400 */
+  color: var(--syntax-boolean, #f472b6);
+  /* pink-400 */
   font-weight: 500;
 }
 
 .token.null {
-  color: #cbd5e1; /* slate-300 */
+  color: var(--syntax-null, #cbd5e1);
+  /* slate-300 */
   font-weight: 500;
 }
 
@@ -118,11 +125,12 @@
 .token.url,
 .language-css .token.string,
 .style .token.string {
-  color: #94a3b8;
+  color: var(--syntax-operator, #94a3b8);
 }
 
 .token.keyword {
-  color: #c084fc; /* purple-400 */
+  color: var(--syntax-keyword, #c084fc);
+  /* purple-400 */
   font-weight: 500;
 }
 
@@ -131,20 +139,24 @@
 .token.definition-mutation,
 .token.definition-subscription,
 .token.function {
-  color: #818cf8; /* indigo-400 */
+  color: var(--syntax-function, #818cf8);
+  /* indigo-400 */
   font-weight: 600;
 }
 
 .token.variable {
-  color: #f59e0b; /* amber-500 */
+  color: var(--syntax-variable, #f59e0b);
+  /* amber-500 */
 }
 
 .token.attr-name {
-  color: #67e8f9; /* cyan-300 */
+  color: var(--syntax-attribute, #67e8f9);
+  /* cyan-300 */
 }
 
 .token.class-name {
-  color: #a78bfa; /* violet-400 */
+  color: var(--syntax-class-name, #a78bfa);
+  /* violet-400 */
 }
 
 /* Important / Bold / Italic */
@@ -152,6 +164,7 @@
 .token.bold {
   font-weight: bold;
 }
+
 .token.italic {
   font-style: italic;
 }

@@ -230,7 +230,11 @@ export type RequestBody = { mode: BodyMode | null, raw?: string, formData?: Arra
 
 export type RequestItem = { "type": "http" } & ApiRequest | { "type": "grpc" } & GrpcRequest | { "type": "graphql" } & GraphQlRequest;
 
-export type Theme = { id: string, name: string, isBuiltin: boolean, tokens: ThemeTokens, };
+export type Theme = { $schema: string, id: string, name: string, version: string, description: string, author: string, repository: string, license: string, tags: Array<string>, variant: ThemeVariant, isBuiltin: boolean, tokens: ThemeTokens, };
+
+export type ThemeSyntax = { comment: string, property: string, string: string, number: string, boolean: string, keyword: string, punctuation: string, operator: string, };
+
+export type ThemeTokens = { ui: ThemeUI, syntax: ThemeSyntax, };
 
 /**
  * Mirrors the `@theme` tokens in the frontend's `src/index.css`. Custom
@@ -238,7 +242,9 @@ export type Theme = { id: string, name: string, isBuiltin: boolean, tokens: Them
  * frontend applies a theme by writing these as CSS custom properties
  * on `:root` at runtime (see commands/themes.rs doc comment).
  */
-export type ThemeTokens = { colorBg: string, colorPanel: string, colorPanelRaised: string, colorBorder: string, colorBorderMuted: string, colorTextPrimary: string, colorTextSecondary: string, colorTextMuted: string, colorPrimary: string, colorPrimaryHover: string, colorSecondary: string, colorSuccess: string, colorError: string, colorWarning: string, radiusMd: string, radiusLg: string, fontSans: string, fontMono: string, };
+export type ThemeUI = { colorBg: string, colorPanel: string, colorPanelRaised: string, colorBorder: string, colorBorderMuted: string, colorTextPrimary: string, colorTextSecondary: string, colorTextMuted: string, colorPrimary: string, colorPrimaryHover: string, colorSecondary: string, colorSuccess: string, colorError: string, colorWarning: string, methodGet: string, methodPost: string, methodPut: string, methodDelete: string, methodPatch: string, methodQuery: string, methodWs: string, methodGrpc: string, methodGraphql: string, radiusMd: string, radiusLg: string, fontSans: string, fontMono: string, };
+
+export type ThemeVariant = "dark" | "light";
 
 export type UploadedFile = { id: string, name: string, sizeBytes: bigint, 
 /**

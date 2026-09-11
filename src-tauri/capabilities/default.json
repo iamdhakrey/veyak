@@ -19,6 +19,7 @@
     "core:window:allow-start-dragging",
     "store:default",
     "oauth:allow-start",
-    "oauth:allow-cancel"
+    "oauth:allow-cancel",
+    "dialog:allow-open"
   ]
 }

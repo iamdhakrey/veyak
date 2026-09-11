@@ -14,7 +14,7 @@ use crate::commands::environments::{
     create_environment, delete_environment, list_environments, list_variables, rename_environment,
     replace_variables, set_active_environment,
 };
-use crate::commands::settings::{get_settings, update_settings};
+use crate::commands::settings::{self, get_settings, update_settings};
 use crate::commands::workspaces::{
     create_workspace, delete_workspace, get_active_state, get_active_state_full, list_workspaces,
     rename_workspace, set_active_workspace,
@@ -170,6 +170,9 @@ pub fn run() {
             graphql::graphql_unsubscribe,
             // fonts
             fonts::get_system_fonts,
+            // Themes
+            settings::list_themes,
+            settings::delete_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Veyak application");
