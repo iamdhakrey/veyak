@@ -3,7 +3,8 @@ use std::path::{Path, PathBuf};
 use serde::{Serialize, de::DeserializeOwned};
 use veyak_error::AppResult;
 use veyak_models::{
-    ActiveState, AppSettings, HttpMethod, RequestItem, Theme, ThemeTokens, Workspace,
+    ActiveState, AppSettings, HttpMethod, RequestItem, Theme, ThemeSyntax, ThemeTokens, ThemeUI,
+    ThemeVariant, Workspace, default_schema,
 };
 
 #[derive(Debug, Clone)]
@@ -27,7 +28,7 @@ impl DataDir {
     }
 
     pub fn themes_path(&self) -> PathBuf {
-        self.root.join("themes.yaml")
+        self.root.join("themes")
     }
 
     pub fn plugins_path(&self) -> PathBuf {
@@ -171,34 +172,11 @@ pub fn init_data_dir(data_dir: &Path) -> AppResult<DataDir> {
         write_yaml(&dd.settings_path(), &AppSettings::default())?;
     }
 
-    // Built-in theme
-    if !dd.themes_path().exists() {
-        let varta_dark = Theme {
-            id: "varta-dark".to_string(),
-            name: "Veyak Dark".to_string(),
-            is_builtin: true,
-            tokens: ThemeTokens {
-                color_bg: "#0D1117".to_string(),
-                color_panel: "#161B22".to_string(),
-                color_panel_raised: "#1C2129".to_string(),
-                color_border: "#30363D".to_string(),
-                color_border_muted: "#21262D".to_string(),
-                color_text_primary: "#E6EDF3".to_string(),
-                color_text_secondary: "#8B949E".to_string(),
-                color_text_muted: "#6E7681".to_string(),
-                color_primary: "#8B5CF6".to_string(),
-                color_primary_hover: "#9D74F8".to_string(),
-                color_secondary: "#3B82F6".to_string(),
-                color_success: "#10B981".to_string(),
-                color_error: "#EF4444".to_string(),
-                color_warning: "#F59E0B".to_string(),
-                radius_md: "8px".to_string(),
-                radius_lg: "10px".to_string(),
-                font_sans: "Inter, ui-sans-serif, system-ui".to_string(),
-                font_mono: "JetBrains Mono, ui-monospace, monospace".to_string(),
-            },
-        };
-        write_yaml(&dd.themes_path(), &vec![varta_dark])?;
+    for theme in default_themes() {
+        let theme_path = dd.themes_path().join(format!("{}.yaml", theme.id));
+        if !theme_path.exists() {
+            write_yaml(&theme_path, &theme)?;
+        }
     }
 
     // Default app state
@@ -206,7 +184,7 @@ pub fn init_data_dir(data_dir: &Path) -> AppResult<DataDir> {
         let state = ActiveState {
             active_workspace_id: Some(default_ws_id.to_string()),
             active_environment_id: None,
-            active_theme_id: Some("varta-dark".to_string()),
+            active_theme_id: Some("veyak-dark".to_string()),
             active_collection_id: None,
             active_folder_id: None,
             active_item_id: None,
@@ -375,4 +353,123 @@ fn migrate_request_http_type(dd: &DataDir) {
     }
 
     let _ = std::fs::write(&marker, "done");
+}
+
+fn default_themes() -> Vec<Theme> {
+    vec![
+        Theme {
+            schema: default_schema(),
+            id: "veyak-dark".to_string(),
+            name: "Veyak Dark".to_string(),
+            author: "Hrithik Dhakrey".to_string(),
+            version: "1.0.0".to_string(),
+            description: "Default Veyak theme".to_string(),
+            license: "MIT".to_string(),
+            is_builtin: true,
+            tags: vec!["dark".to_string(), "default".to_string()],
+            repository: "https://github.com/iamdhakrey/veyak".to_string(),
+            variant: ThemeVariant::Dark,
+            tokens: ThemeTokens {
+                ui: ThemeUI {
+                    color_bg: "#0D1117".to_string(),
+                    color_panel: "#161B22".to_string(),
+                    color_panel_raised: "#1C2129".to_string(),
+                    color_border: "#30363D".to_string(),
+                    color_border_muted: "#21262D".to_string(),
+                    color_text_primary: "#F0F6FC".to_string(),
+                    color_text_secondary: "#9198A1".to_string(),
+                    color_text_muted: "#656C76".to_string(),
+                    color_primary: "#8B5CF6".to_string(),
+                    color_primary_hover: "#9D74F8".to_string(),
+                    color_secondary: "#3B82F6".to_string(),
+                    color_success: "#10B981".to_string(),
+                    color_error: "#EF4444".to_string(),
+                    color_warning: "#F59E0B".to_string(),
+                    method_get: "#2EA043".to_string(),
+                    method_post: "#388BFD".to_string(),
+                    method_put: "#F7681D".to_string(),
+                    method_patch: "#FFB833".to_string(),
+                    method_delete: "#FF445E".to_string(),
+                    method_ws: "#792DFF".to_string(),
+                    method_query: "#9D74F8".to_string(),
+                    method_grpc: "#9D74F8".to_string(),
+                    method_graphql: "#E30372".to_string(),
+                    radius_md: "8px".to_string(),
+                    radius_lg: "10px".to_string(),
+                },
+                syntax: ThemeSyntax {
+                    keyword: "#FF7B72".to_string(),
+                    string: "#7EE787".to_string(),
+                    comment: "#8B949E".to_string(),
+                    property: "#79C0FF".to_string(),
+                    punctuation: "#C9D1D9".to_string(),
+                    operator: "#F2CC60".to_string(),
+                    number: "#D2A8FF".to_string(),
+                    boolean: "#FFAB70".to_string(),
+                    null: "#FFAB70".to_string(),
+                    function: "#FFAB70".to_string(),
+                    variable: "#FFAB70".to_string(),
+                    attribute: "#FFAB70".to_string(),
+                    class_name: "#FFAB70".to_string(),
+                },
+            },
+        },
+        Theme {
+            schema: default_schema(),
+            author: "Hrithik Dhakrey".to_string(),
+            description: "Default Veyak theme".to_string(),
+            license: "MIT".to_string(),
+            is_builtin: true,
+            tags: vec!["dark".to_string(), "default".to_string()],
+            repository: "https://github.com/iamdhakrey/veyak".to_string(),
+            variant: ThemeVariant::Dark,
+            id: "vscode-dark-plus".to_string(),
+            name: "VS Code Dark+".to_string(),
+            version: "1.0.0".to_string(),
+            tokens: ThemeTokens {
+                ui: ThemeUI {
+                    color_bg: "#1E1E1E".to_string(),
+                    color_panel: "#252526".to_string(),
+                    color_panel_raised: "#2D2D2D".to_string(),
+                    color_border: "#3C3C3C".to_string(),
+                    color_border_muted: "#2B2B2B".to_string(),
+                    color_text_primary: "#CCCCCC".to_string(),
+                    color_text_secondary: "#969696".to_string(),
+                    color_text_muted: "#6E7681".to_string(),
+                    color_primary: "#007ACC".to_string(),
+                    color_primary_hover: "#0062A3".to_string(),
+                    color_secondary: "#3A3D41".to_string(),
+                    color_success: "#89D185".to_string(),
+                    color_error: "#F48771".to_string(),
+                    color_warning: "#CCA700".to_string(),
+                    method_get: "#4EC9B0".to_string(),
+                    method_post: "#569CD6".to_string(),
+                    method_put: "#DCDCAA".to_string(),
+                    method_delete: "#F44747".to_string(),
+                    method_patch: "#C586C0".to_string(),
+                    method_query: "#9CDCFE".to_string(),
+                    method_ws: "#B5CEA8".to_string(),
+                    method_grpc: "#4FC1FF".to_string(),
+                    method_graphql: "#E06C75".to_string(),
+                    radius_md: "4px".to_string(),
+                    radius_lg: "6px".to_string(),
+                },
+                syntax: ThemeSyntax {
+                    keyword: "#C586C0".to_string(),
+                    string: "#CE9178".to_string(),
+                    comment: "#6A9955".to_string(),
+                    property: "#9CDCFE".to_string(),
+                    punctuation: "#D4D4D4".to_string(),
+                    operator: "#D4D4D4".to_string(),
+                    number: "#B5CEA8".to_string(),
+                    boolean: "#569CD6".to_string(),
+                    null: "#569CD6".to_string(),
+                    function: "#569CD6".to_string(),
+                    variable: "#569CD6".to_string(),
+                    attribute: "#569CD6".to_string(),
+                    class_name: "#569CD6".to_string(),
+                },
+            },
+        },
+    ]
 }

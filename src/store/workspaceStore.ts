@@ -7,7 +7,9 @@ import {
   EnvironmentVariable,
   EnvironmentWithVariables,
   AdditionType,
+  ActiveState,
 } from "@veyak-internal/models";
+import { useThemeStore } from "./themeStore";
 
 export interface WorkspaceStore {
   environments: EnvironmentWithVariables[];
@@ -213,11 +215,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
 
   getActiveState: async () => {
     try {
-      const fullState = await invoke<{
-        activeWorkspaceId?: string;
-        activeEnvironmentId?: string;
-        activeCollectionId?: string;
-      }>("get_active_state_full");
+      const fullState = await invoke<ActiveState>("get_active_state_full");
       if (fullState.activeWorkspaceId) {
         set({ activeWorkspaceId: fullState.activeWorkspaceId });
       }
@@ -226,6 +224,9 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       }
       if (fullState.activeCollectionId) {
         set({ activeCollectionId: fullState.activeCollectionId });
+      }
+      if (fullState.activeThemeId) {
+        useThemeStore.getState().setActiveThemeId(fullState.activeThemeId);
       }
       console.log("Restored active state:", fullState);
     } catch (err) {
