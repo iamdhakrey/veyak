@@ -367,7 +367,11 @@ fn default_themes() -> Vec<Theme> {
             description: "Default brand palette with deep slate & violet".to_string(),
             license: "MIT".to_string(),
             is_builtin: true,
-            tags: vec!["dark".to_string(), "default".to_string(), "violet".to_string()],
+            tags: vec![
+                "dark".to_string(),
+                "default".to_string(),
+                "violet".to_string(),
+            ],
             repository: "https://github.com/iamdhakrey/veyak".to_string(),
             variant: ThemeVariant::Dark,
             tokens: ThemeTokens {
@@ -425,7 +429,11 @@ fn default_themes() -> Vec<Theme> {
             description: "Zed's signature zinc & blue aesthetic".to_string(),
             license: "MIT".to_string(),
             is_builtin: true,
-            tags: vec!["dark".to_string(), "default".to_string(), "zinc".to_string()],
+            tags: vec![
+                "dark".to_string(),
+                "default".to_string(),
+                "zinc".to_string(),
+            ],
             repository: "https://github.com/iamdhakrey/veyak".to_string(),
             variant: ThemeVariant::Dark,
             tokens: ThemeTokens {
@@ -604,7 +612,11 @@ fn default_themes() -> Vec<Theme> {
             description: "Warm, soothing pastel aesthetic".to_string(),
             license: "MIT".to_string(),
             is_builtin: true,
-            tags: vec!["dark".to_string(), "default".to_string(), "pastel".to_string()],
+            tags: vec![
+                "dark".to_string(),
+                "default".to_string(),
+                "pastel".to_string(),
+            ],
             repository: "https://github.com/iamdhakrey/veyak".to_string(),
             variant: ThemeVariant::Dark,
             tokens: ThemeTokens {
@@ -662,7 +674,11 @@ fn default_themes() -> Vec<Theme> {
             description: "Cyber blue & purple nighttime theme".to_string(),
             license: "MIT".to_string(),
             is_builtin: true,
-            tags: vec!["dark".to_string(), "default".to_string(), "purple".to_string()],
+            tags: vec![
+                "dark".to_string(),
+                "default".to_string(),
+                "purple".to_string(),
+            ],
             repository: "https://github.com/iamdhakrey/veyak".to_string(),
             variant: ThemeVariant::Dark,
             tokens: ThemeTokens {
