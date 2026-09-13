@@ -8,7 +8,7 @@ import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "./store/settingStore";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useAuth0Desktop } from "./hooks/useAuth0Desktop";
 import { useMobileDetect } from "./hooks/useMobileDetect";
-import { SettingsPanel } from "./components/SettingsPanel";
+import { SettingsPanel } from "./components/Settings/SettingsPanel";
 import { EnvironmentModal } from "./components/EnvironmentModal";
 import { Menu } from "lucide-react";
 import { UpdaterOverlay } from "./components/UpdaterOverlay";
