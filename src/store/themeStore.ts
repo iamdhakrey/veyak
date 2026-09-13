@@ -11,7 +11,6 @@ interface ThemeState {
   applyTheme: (theme: Theme) => void;
   setActiveThemeId: (id: string) => Promise<void>;
   fetchThemes: () => Promise<void>;
-  openThemesFolder: () => Promise<void>;
   importTheme: (filePath: string) => Promise<void>;
   exportTheme: (themeId: string, destinationDir: string) => Promise<void>;
   deleteCustomTheme: (themeId: string) => Promise<void>;
@@ -160,12 +159,6 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
     }
   },
 
-  openThemesFolder: async () => {
-    await invoke("open_themes_dir").catch((err) =>
-      console.error("Failed to open themes directory:", err),
-    );
-  },
-
   importTheme: async (filePath: string) => {
     try {
       const imported = await invoke<Theme>("import_theme_file", {
@@ -201,7 +194,7 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
         if (nextActive && state.activeThemeId === themeId) {
           get().applyTheme(nextActive);
           invoke("set_active_theme", { themeId: nextActive.id }).catch(
-            () => { },
+            () => {},
           );
         }
 

@@ -5,7 +5,7 @@ import {
 } from "../../store/settingStore";
 import { useThemeStore } from "../../store/themeStore";
 import { invoke } from "@tauri-apps/api/core";
-import { ExternalLink, FolderOpen, Palette, Trash2, Type } from "lucide-react";
+import { ExternalLink, Palette, Trash2, Type } from "lucide-react";
 import { ToggleRow } from "./ToggleRow";
 
 export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
@@ -43,7 +43,6 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
   const activeThemeId = useThemeStore((s) => s.activeThemeId);
   const activeTheme = useThemeStore((s) => s.activeTheme);
   const setActiveThemeId = useThemeStore((s) => s.setActiveThemeId);
-  const openThemesFolder = useThemeStore((s) => s.openThemesFolder);
   const deleteCustomTheme = useThemeStore((s) => s.deleteCustomTheme);
   const fetchThemes = useThemeStore((s) => s.fetchThemes);
 
@@ -83,14 +82,6 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
             Theme
           </h3>
           <div className="flex items-center gap-1.5">
-            <button
-              onClick={() => openThemesFolder()}
-              className="flex items-center gap-1 text-xs text-text-secondary bg-panel hover:bg-borderMuted hover:text-text-primary px-2.5 py-1.5 rounded-md border border-border transition-colors cursor-pointer"
-              title="Open system themes directory"
-            >
-              <FolderOpen className="w-3.5 h-3.5" />
-              <span>Folder</span>
-            </button>
             {selectedTheme && !isBuiltin && (
               <button
                 onClick={() => deleteCustomTheme(selectedTheme.id)}
