@@ -1,8 +1,7 @@
 use std::sync::Arc;
-use tauri::{Emitter, Manager, Window};
+use tauri::{AppHandle, Emitter, Manager, Window};
 use tauri_plugin_oauth::start;
-
-use tokio::sync::Mutex;
+use url::Url;
 
 use crate::commands::collections::{
     clone_collection, create_collection, create_folder, create_request, create_ws_request,
@@ -25,6 +24,7 @@ use crate::ws::{
     ws_add_saved_message, ws_connect, ws_delete_saved_message, ws_disconnect,
     ws_list_saved_messages, ws_send, ws_update_saved_message,
 };
+use tokio::sync::Mutex;
 
 use crate::commands::auth::{self, PkceSessionState};
 use crate::commands::graphql;
@@ -57,6 +57,40 @@ async fn start_server(window: Window) -> Result<u16, String> {
     .map_err(|err| err.to_string())
 }
 
+fn handle_deep_link(app: &AppHandle, raw_url: &str) {
+    let parsed = match Url::parse(raw_url) {
+        Ok(u) => u,
+        Err(_) => return,
+    };
+
+    if parsed.scheme() == "veyak" && parsed.domain() == Some("theme") && parsed.path() == "/install"
+    {
+        let mut theme_id = String::new();
+
+        for (key, value) in parsed.query_pairs() {
+            match key.as_ref() {
+                "theme_id" | "id" => theme_id = value.to_string(),
+                _ => {}
+            }
+        }
+
+        // Unminimize & bring window to front
+        if let Some(window) = app.get_webview_window("main") {
+            let _ = window.show();
+            let _ = window.unminimize();
+            let _ = window.set_focus();
+        }
+
+        // Forward to frontend
+        let _ = app.emit(
+            "deep-link://theme-install",
+            serde_json::json!({
+                "id": theme_id,
+            }),
+        );
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -66,8 +100,15 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_oauth::init())
+        .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            if let Some(url) = argv.into_iter().find(|arg| arg.starts_with("veyak://")) {
+                handle_deep_link(app, &url);
+            }
+        }))
         .setup(|app| {
             let app_handle = app.handle().clone();
+
             let data_dir = app_handle
                 .path()
                 .app_data_dir()

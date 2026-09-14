@@ -31,30 +31,6 @@ pub fn get_theme(dd: &DataDir, id: &str) -> AppResult<Theme> {
         .ok_or_else(|| AppError::NotFound(format!("theme '{id}'")))
 }
 
-// pub fn save_custom_theme(
-//     dd: &DataDir,
-//     id: Option<&str>,
-//     name: &str,
-//     tokens: &ThemeTokens,
-// ) -> AppResult<Theme> {
-//     let id = id.map(str::to_string).unwrap_or_else(veyak_db::new_id);
-//     let mut themes: Vec<Theme> = read_yaml_vec(&dd.themes_path())?;
-
-//     if let Some(existing) = themes.iter_mut().find(|t| t.id == id) {
-//         existing.name = name.to_string();
-//         existing.tokens = tokens.clone();
-//     } else {
-//         themes.push(Theme {
-//             id: id.clone(),
-//             name: name.to_string(),
-//             tokens: tokens.clone(),
-//         });
-//     }
-
-//     write_yaml(&dd.themes_path(), &themes)?;
-//     get_theme(dd, &id)
-// }
-
 pub fn delete_theme(dd: &DataDir, id: &str) -> AppResult<()> {
     let theme = get_theme(dd, id)?;
     if theme.is_builtin {
@@ -66,3 +42,4 @@ pub fn delete_theme(dd: &DataDir, id: &str) -> AppResult<()> {
     themes.retain(|t| t.id != id);
     write_yaml(&dd.themes_path(), &themes)
 }
+
