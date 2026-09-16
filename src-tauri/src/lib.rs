@@ -57,12 +57,13 @@ async fn start_server(window: Window) -> Result<u16, String> {
     .map_err(|err| err.to_string())
 }
 
-fn handle_deep_link(app: &AppHandle, raw_url: &str) {
+async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
     let parsed = match Url::parse(raw_url) {
         Ok(u) => u,
         Err(_) => return,
     };
 
+    log::info!("{}", parsed);
     if parsed.scheme() == "veyak" && parsed.domain() == Some("theme") && parsed.path() == "/install"
     {
         let mut theme_id = String::new();
@@ -73,6 +74,13 @@ fn handle_deep_link(app: &AppHandle, raw_url: &str) {
                 _ => {}
             }
         }
+
+        let app_dir = app.path().app_data_dir().expect("resolve app data dir");
+        let data_dir = veyak_db::init_data_dir(&app_dir).expect("initialize data directory");
+
+        let _ = db::themes::install_theme(&data_dir, &theme_id).await;
+
+        let _ = crate::db::app_state::set_active_theme(&data_dir, &theme_id);
 
         // Unminimize & bring window to front
         if let Some(window) = app.get_webview_window("main") {
@@ -94,6 +102,11 @@ fn handle_deep_link(app: &AppHandle, raw_url: &str) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(tauri_plugin_log::log::LevelFilter::Info)
+                .build(),
+        )
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
@@ -103,7 +116,10 @@ pub fn run() {
         .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
             if let Some(url) = argv.into_iter().find(|arg| arg.starts_with("veyak://")) {
-                handle_deep_link(app, &url);
+                let app_handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    handle_deep_link(&app_handle, &url).await;
+                });
             }
         }))
         .setup(|app| {

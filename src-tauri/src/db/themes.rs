@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use veyak_db::{read_yaml, read_yaml_vec, write_yaml, DataDir};
 use veyak_error::{AppError, AppResult};
 use veyak_models::Theme;
@@ -43,3 +45,31 @@ pub fn delete_theme(dd: &DataDir, id: &str) -> AppResult<()> {
     write_yaml(&dd.themes_path(), &themes)
 }
 
+pub async fn install_theme(dd: &DataDir, theme_id: &str) -> AppResult<()> {
+    const REGISTRY_URL: &str = "https://veyak.iamdhakrey.dev/themes/registry.json";
+
+    // 1. Fetch registry asynchronously
+    let response = reqwest::get(REGISTRY_URL)
+        .await
+        .map_err(|e| AppError::Invalid(e.to_string()))?;
+    let registry: Vec<Theme> = response
+        .json()
+        .await
+        .map_err(|e| AppError::Invalid(e.to_string()))?;
+
+    // 2. Locate matching theme manifest
+    let theme = registry
+        .into_iter()
+        .find(|t| t.id == theme_id)
+        .ok_or_else(|| AppError::NotFound(format!("theme '{theme_id}'")))?;
+
+    // 3. Resolve destination file path inside the themes directory
+    let theme_file: PathBuf = dd.themes_path().join(format!("{theme_id}.yaml"));
+
+    // 4. Ensure destination directory exists before writing
+    if let Some(parent) = theme_file.parent() {
+        std::fs::create_dir_all(parent)?;
+    }
+    // 5. Persist to disk
+    write_yaml(&theme_file, &theme)
+}
