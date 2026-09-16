@@ -59,58 +59,80 @@ async fn start_server(window: Window) -> Result<u16, String> {
 }
 
 async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
-    let parsed = match Url::parse(raw_url) {
+    let clean_url = raw_url.trim_matches(|c| c == '\'' || c == '"').trim();
+    let parsed = match Url::parse(clean_url) {
         Ok(u) => u,
         Err(e) => {
-            log::warn!("Failed to parse deep link URL '{}': {}", raw_url, e);
+            log::warn!("Failed to parse deep link URL '{}': {}", clean_url, e);
             return;
         }
     };
 
     log::info!("Handling deep link: {}", parsed);
-    if parsed.scheme() == "veyak" && parsed.domain() == Some("theme") && parsed.path() == "/install"
-    {
-        let mut theme_id = String::new();
+    if parsed.scheme().eq_ignore_ascii_case("veyak") {
+        let is_theme_install = (parsed.domain() == Some("theme")
+            || parsed.host_str() == Some("theme")
+            || parsed.path().starts_with("/theme"))
+            && (parsed.path() == "/install"
+                || parsed.path().ends_with("/install")
+                || parsed.host_str() == Some("theme"));
 
-        for (key, value) in parsed.query_pairs() {
-            match key.as_ref() {
-                "theme_id" | "id" => theme_id = value.to_string(),
-                _ => {}
+        if is_theme_install {
+            let mut theme_id = String::new();
+
+            for (key, value) in parsed.query_pairs() {
+                match key.as_ref() {
+                    "theme_id" | "id" => theme_id = value.to_string(),
+                    _ => {}
+                }
             }
-        }
 
-        if theme_id.is_empty() {
-            log::warn!(
-                "Theme install deep-link missing theme_id/id parameter: {}",
-                raw_url
+            if theme_id.is_empty() {
+                log::warn!(
+                    "Theme install deep-link missing theme_id/id parameter: {}",
+                    clean_url
+                );
+                return;
+            }
+
+            // Unminimize & bring window to front
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.show();
+                let _ = window.unminimize();
+                let _ = window.set_focus();
+            }
+
+            // Pre-fetch theme preview from registry if possible
+            let theme_preview = crate::db::themes::fetch_theme_preview(&theme_id).await.ok();
+
+            // Forward to frontend for confirmation (DO NOT write to disk or apply yet)
+            let _ = app.emit(
+                "deep-link://theme-install",
+                serde_json::json!({
+                    "id": theme_id,
+                    "theme": theme_preview,
+                }),
             );
-            return;
         }
-
-        // Unminimize & bring window to front
-        if let Some(window) = app.get_webview_window("main") {
-            let _ = window.show();
-            let _ = window.unminimize();
-            let _ = window.set_focus();
-        }
-
-        // Pre-fetch theme preview from registry if possible
-        let theme_preview = crate::db::themes::fetch_theme_preview(&theme_id).await.ok();
-
-        // Forward to frontend for confirmation (DO NOT write to disk or apply yet)
-        let _ = app.emit(
-            "deep-link://theme-install",
-            serde_json::json!({
-                "id": theme_id,
-                "theme": theme_preview,
-            }),
-        );
     }
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            let app_handle = app.clone();
+            if let Some(raw) = argv.into_iter().find(|arg| {
+                let lower = arg.trim_matches(|c| c == '\'' || c == '"').to_lowercase();
+                lower.starts_with("veyak://") || lower.starts_with("veyak:")
+            }) {
+                let clean_url = raw.trim_matches(|c| c == '\'' || c == '"').to_string();
+                tauri::async_runtime::spawn(async move {
+                    handle_deep_link(&app_handle, &clean_url).await;
+                });
+            }
+        }))
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(
             tauri_plugin_log::Builder::new()
                 .level(tauri_plugin_log::log::LevelFilter::Info)
@@ -122,17 +144,15 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_oauth::init())
-        .plugin(tauri_plugin_deep_link::init())
-        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
-            if let Some(url) = argv.into_iter().find(|arg| arg.starts_with("veyak://")) {
-                let app_handle = app.clone();
-                tauri::async_runtime::spawn(async move {
-                    handle_deep_link(&app_handle, &url).await;
-                });
-            }
-        }))
         .setup(|app| {
             let app_handle = app.handle().clone();
+
+            #[cfg(any(target_os = "linux", all(debug_assertions, windows)))]
+            {
+                if let Err(e) = app.deep_link().register_all() {
+                    log::warn!("Failed to register deep link schemes: {}", e);
+                }
+            }
 
             let data_dir = app_handle
                 .path()
@@ -166,6 +186,20 @@ pub fn run() {
                     });
                 }
             });
+
+            // Handle cold-start deep links passed via CLI argument
+            let initial_url = std::env::args().skip(1).find(|arg| {
+                let lower = arg.trim_matches(|c| c == '\'' || c == '"').to_lowercase();
+                lower.starts_with("veyak://") || lower.starts_with("veyak:")
+            });
+            if let Some(url) = initial_url {
+                let app_handle_init = app_handle.clone();
+                let clean_url = url.trim_matches(|c| c == '\'' || c == '"').to_string();
+                tauri::async_runtime::spawn(async move {
+                    tokio::time::sleep(tokio::time::Duration::from_millis(800)).await;
+                    handle_deep_link(&app_handle_init, &clean_url).await;
+                });
+            }
 
             Ok(())
         })

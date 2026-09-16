@@ -917,7 +917,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
 
   deleteCustomTheme: async (themeId: string) => {
     try {
-      await invoke("delete_theme", { themeId });
+      await invoke("delete_theme", { id: themeId });
       set((state) => {
         const remaining = state.themes.filter((t) => t.id !== themeId);
         const nextActive =

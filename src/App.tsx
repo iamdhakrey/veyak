@@ -19,6 +19,7 @@ import Titlebar from "./components/TitleBar";
 import { NewReqSaveModal } from "./components/NewRequestSaveModal";
 import { useWorkspaceStore } from "./store/workspaceStore";
 import { listen } from "@tauri-apps/api/event";
+import { getCurrent } from "@tauri-apps/plugin-deep-link";
 
 export default function App() {
   useAuth0Desktop();
@@ -38,6 +39,36 @@ export default function App() {
     // 1. Initial hydration and CSS token application
     fetchThemes();
 
+    // Helper to process raw deep link URL strings
+    const handleRawDeepLink = (rawUrl: string) => {
+      try {
+        const clean = rawUrl.replace(/^['"]|['"]$/g, "").trim();
+        const urlObj = new URL(clean);
+        if (urlObj.protocol.replace(":", "").toLowerCase() === "veyak") {
+          const themeId = urlObj.searchParams.get("theme_id") || urlObj.searchParams.get("id");
+          if (themeId) {
+            openInstallThemeModal(themeId);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not parse deep link URL:", rawUrl, err);
+      }
+    };
+
+    // Check cold-start deep links on mount
+    getCurrent()
+      .then((urls) => {
+        if (urls && urls.length > 0) {
+          const first = Array.isArray(urls) ? urls[0] : (urls as any);
+          if (first) {
+            handleRawDeepLink(typeof first === "string" ? first : first.toString());
+          }
+        }
+      })
+      .catch((err) => {
+        console.warn("Could not query getCurrent deep links:", err);
+      });
+
     // 2. Handle deep link payload triggered from veyak://theme/install
     const unlistenPromise = listen<{ id?: string; theme?: any } | string>(
       "deep-link://theme-install",
@@ -51,7 +82,11 @@ export default function App() {
               openInstallThemeModal(payload.id);
             }
           } else if (typeof payload === "string") {
-            openInstallThemeModal(payload);
+            if (payload.toLowerCase().startsWith("veyak://") || payload.toLowerCase().startsWith("veyak:")) {
+              handleRawDeepLink(payload);
+            } else {
+              openInstallThemeModal(payload);
+            }
           }
         } catch (err) {
           console.error("Deep link theme installation handler failed:", err);

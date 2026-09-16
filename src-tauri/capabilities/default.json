@@ -21,6 +21,11 @@
     "oauth:allow-start",
     "oauth:allow-cancel",
     "dialog:allow-open",
-    "log:default"
+    "log:default",
+    "deep-link:default",
+    "deep-link:allow-get-current",
+    "deep-link:allow-register",
+    "deep-link:allow-unregister",
+    "deep-link:allow-is-registered"
   ]
 }
