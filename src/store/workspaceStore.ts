@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
-import { Workspace } from "../types";
+import { SYNTAX_CSS_VAR_MAP, UI_CSS_VAR_MAP, Workspace } from "../types";
 import {
   Collection,
   CollectionTree,
@@ -8,8 +8,8 @@ import {
   EnvironmentWithVariables,
   AdditionType,
   ActiveState,
+  Theme,
 } from "@veyak-internal/models";
-import { useThemeStore } from "./themeStore";
 
 export interface WorkspaceStore {
   environments: EnvironmentWithVariables[];
@@ -87,6 +87,18 @@ export interface WorkspaceStore {
     variables: EnvironmentVariable[],
   ) => Promise<void>;
   setActiveEnvironment: (id: string | null) => Promise<void>;
+
+
+  // Theme Store
+
+  themes: Theme[];
+  activeThemeId: string;
+  activeTheme: Theme | null;
+
+  applyTheme: (theme: Theme) => void;
+  setActiveThemeId: (id: string) => Promise<void>;
+  fetchThemes: () => Promise<void>;
+  deleteCustomTheme: (themeId: string) => Promise<void>;
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
@@ -102,6 +114,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   error: null,
   activeEnvironmentId: null,
   environments: [],
+  themes: [],
+  activeTheme: null,
+  activeThemeId: "veyak-dark",
+
 
   additionTypes: [],
   fetchAdditionTypes: async () => {
@@ -226,7 +242,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         set({ activeCollectionId: fullState.activeCollectionId });
       }
       if (fullState.activeThemeId) {
-        useThemeStore.getState().setActiveThemeId(fullState.activeThemeId);
+        set({ activeThemeId: fullState.activeThemeId });
+        get().fetchThemes();
       }
       console.log("Restored active state:", fullState);
     } catch (err) {
@@ -691,6 +708,102 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       await invoke("set_active_environment", { environmentid: id ?? null });
     } catch (error) {
       console.error("Failed to persist active environment:", error);
+    }
+  },
+
+  //  Themes 
+
+  applyTheme: (theme: Theme) => {
+    if (!theme?.tokens) return;
+
+    const root = document.documentElement;
+    const { ui, syntax } = theme.tokens;
+
+    if (ui) {
+      Object.entries(ui).forEach(([key, val]) => {
+        const varName = UI_CSS_VAR_MAP[key];
+        if (varName && val) {
+          root.style.setProperty(varName, String(val));
+        }
+      });
+    }
+
+    if (syntax) {
+      Object.entries(syntax).forEach(([key, val]) => {
+        const varName = SYNTAX_CSS_VAR_MAP[key];
+        if (varName && val) {
+          root.style.setProperty(varName, String(val));
+        }
+      });
+    }
+
+    set({ activeTheme: theme, activeThemeId: theme.id });
+  },
+
+  setActiveThemeId: async (id: string) => {
+    const target = get().themes.find((t) => t.id === id);
+    if (target) {
+      get().applyTheme(target);
+      await invoke("set_active_theme", { id: id }).catch((err) =>
+        console.error("Failed to persist active theme:", err),
+      );
+    }
+  },
+
+  fetchThemes: async () => {
+    // Prevent duplicate concurrent requests during fast re-renders
+    if (get().isLoading) return;
+    set({ isLoading: true });
+
+    try {
+      const activeThemeId = get().activeThemeId;
+      const [themes] = await Promise.all([invoke<Theme[]>("list_themes")]);
+
+      const targetTheme =
+        themes.find((t) => t.id === activeThemeId) || themes[0] || null;
+
+      set({
+        themes,
+        activeThemeId: targetTheme ? targetTheme.id : activeThemeId,
+        activeTheme: targetTheme,
+      });
+
+      if (targetTheme) {
+        get().applyTheme(targetTheme);
+      }
+    } catch (err) {
+      console.error("Failed to load desktop themes:", err);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+
+  deleteCustomTheme: async (themeId: string) => {
+    try {
+      await invoke("delete_theme", { themeId });
+      set((state) => {
+        const remaining = state.themes.filter((t) => t.id !== themeId);
+        const nextActive =
+          state.activeThemeId === themeId
+            ? remaining[0] || null
+            : state.activeTheme;
+
+        if (nextActive && state.activeThemeId === themeId) {
+          get().applyTheme(nextActive);
+          invoke("set_active_theme", { themeId: nextActive.id }).catch(
+            () => { },
+          );
+        }
+
+        return {
+          themes: remaining,
+          activeTheme: nextActive,
+          activeThemeId: nextActive?.id ?? "",
+        };
+      });
+    } catch (err) {
+      console.error("Failed to delete custom theme:", err);
     }
   },
 }));

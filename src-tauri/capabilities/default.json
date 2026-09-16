@@ -20,6 +20,7 @@
     "store:default",
     "oauth:allow-start",
     "oauth:allow-cancel",
-    "dialog:allow-open"
+    "dialog:allow-open",
+    "log:default"
   ]
 }

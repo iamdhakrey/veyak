@@ -14,8 +14,7 @@ import { Menu } from "lucide-react";
 import { UpdaterOverlay } from "./components/UpdaterOverlay";
 import Titlebar from "./components/TitleBar";
 import { NewReqSaveModal } from "./components/NewRequestSaveModal";
-import { useThemeStore } from "./store/themeStore";
-import { listen } from "@tauri-apps/api/event";
+import { useWorkspaceStore } from "./store/workspaceStore";
 
 export default function App() {
   useAuth0Desktop();
@@ -28,27 +27,27 @@ export default function App() {
   const initGrpcListener = useVartaStore((s) => s.initGrpcListener);
   const initGraphqlListener = useVartaStore((s) => s.initGraphqlListener);
 
-  const fetchThemes = useThemeStore((s) => s.fetchThemes);
-  const importTheme = useThemeStore((s) => s.importTheme);
+  const fetchThemes = useWorkspaceStore((s) => s.fetchThemes);
+  // const importTheme = useWorkspaceStore((s) => s.importTheme);
 
   useEffect(() => {
     // 1. Initial hydration and CSS token application
     fetchThemes();
 
     // 2. Handle deep link payload triggered from veyak.iamdhakrey.dev
-    const unlistenPromise = listen<string>('deep-link://theme-install', async (event) => {
-      try {
-        const rawPayload = event.payload; // Contains downloaded JSON file path or raw URL
-        await importTheme(rawPayload);
-      } catch (err) {
-        console.error('Deep link theme installation failed:', err);
-      }
-    });
+    // const unlistenPromise = listen<string>('deep-link://theme-install', async (event) => {
+    //   try {
+    //     const rawPayload = event.payload; // Contains downloaded JSON file path or raw URL
+    //     await importTheme(rawPayload);
+    //   } catch (err) {
+    //     console.error('Deep link theme installation failed:', err);
+    //   }
+    // });
 
     return () => {
-      unlistenPromise.then((unlisten) => unlisten());
+      // unlistenPromise.then((unlisten) => unlisten());
     };
-  }, [fetchThemes, importTheme]);
+  }, [fetchThemes]);
 
   // Initialize Tauri WS, gRPC & GraphQL event listeners on mount
   useEffect(() => {

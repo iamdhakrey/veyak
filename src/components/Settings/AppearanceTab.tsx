@@ -3,10 +3,10 @@ import {
   DEFAULT_FONT_SETTINGS,
   useSettingsStore,
 } from "../../store/settingStore";
-import { useThemeStore } from "../../store/themeStore";
 import { invoke } from "@tauri-apps/api/core";
 import { ExternalLink, Palette, Trash2, Type } from "lucide-react";
 import { ToggleRow } from "./ToggleRow";
+import { useWorkspaceStore } from "../../store/workspaceStore";
 
 export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
   isMobile = false,
@@ -39,12 +39,12 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
   const [isLoadingFonts, setIsLoadingFonts] = useState(true);
 
   // Theme Store
-  const themes = useThemeStore((s) => s.themes);
-  const activeThemeId = useThemeStore((s) => s.activeThemeId);
-  const activeTheme = useThemeStore((s) => s.activeTheme);
-  const setActiveThemeId = useThemeStore((s) => s.setActiveThemeId);
-  const deleteCustomTheme = useThemeStore((s) => s.deleteCustomTheme);
-  const fetchThemes = useThemeStore((s) => s.fetchThemes);
+  const themes = useWorkspaceStore((s) => s.themes);
+  const activeThemeId = useWorkspaceStore((s) => s.activeThemeId);
+  const activeTheme = useWorkspaceStore((s) => s.activeTheme);
+  const setActiveThemeId = useWorkspaceStore((s) => s.setActiveThemeId);
+  const deleteCustomTheme = useWorkspaceStore((s) => s.deleteCustomTheme);
+  const fetchThemes = useWorkspaceStore((s) => s.fetchThemes);
 
   useEffect(() => {
     console.log("appearance themes updated:", themes);
