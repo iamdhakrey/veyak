@@ -86,7 +86,7 @@ export const ThemePickerModal: React.FC<ThemePickerModalProps> = ({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        closeThemePicker(true); // Revert to original
+        closeThemePicker(); // Keeps preview active in TitleBar
       } else if (e.key === "ArrowDown") {
         e.preventDefault();
         setSelectedIdx((prev) => (prev + 1) % Math.max(1, filteredThemes.length));
@@ -100,7 +100,7 @@ export const ThemePickerModal: React.FC<ThemePickerModalProps> = ({
         const selected = filteredThemes[selectedIdx];
         if (selected) {
           setActiveThemeId(selected.id);
-          closeThemePicker(false); // Confirmed
+          closeThemePicker(); // Confirmed
         }
       }
     };
@@ -114,7 +114,7 @@ export const ThemePickerModal: React.FC<ThemePickerModalProps> = ({
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center pt-[10vh] sm:pt-[12vh] bg-black/60 backdrop-blur-xs animate-in fade-in duration-150 p-4"
-      onMouseDown={() => closeThemePicker(true)}
+      onMouseDown={() => closeThemePicker()}
     >
       <div
         className={`relative flex flex-col overflow-hidden rounded-xl border border-border bg-panel shadow-elevated animate-in zoom-in-95 duration-150 ${isMobile ? "w-[95vw] max-h-[80vh]" : "w-full max-w-lg max-h-[75vh]"
@@ -144,7 +144,7 @@ export const ThemePickerModal: React.FC<ThemePickerModalProps> = ({
             </button>
           ) : (
             <span className="text-[10px] text-text-muted font-mono border border-border/80 px-1.5 py-0.5 rounded">
-              ESC to revert
+              ESC to close
             </span>
           )}
         </div>
@@ -173,7 +173,7 @@ export const ThemePickerModal: React.FC<ThemePickerModalProps> = ({
                   onMouseEnter={() => setSelectedIdx(idx)}
                   onClick={() => {
                     setActiveThemeId(theme.id);
-                    closeThemePicker(false);
+                    closeThemePicker();
                   }}
                   className={`flex items-center justify-between px-3 py-2.5 rounded-lg cursor-pointer transition-all duration-100 ${isSelected
                       ? "bg-primary/15 text-text-primary border border-primary/30"

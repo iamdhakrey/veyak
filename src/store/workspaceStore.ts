@@ -9,7 +9,86 @@ import {
   AdditionType,
   ActiveState,
   Theme,
+  ThemeTokens,
 } from "@veyak-internal/models";
+
+const ALL_MANAGED_CSS_VARS: string[] = [
+  "--color-bg",
+  "--color-panel",
+  "--color-panel-raised",
+  "--color-border",
+  "--color-borderMuted",
+  "--color-text-primary",
+  "--color-text-secondary",
+  "--color-text-muted",
+  "--color-primary",
+  "--color-primary-hover",
+  "--color-secondary",
+  "--color-success",
+  "--color-error",
+  "--color-warning",
+  "--color-method-get",
+  "--color-method-post",
+  "--color-method-put",
+  "--color-method-delete",
+  "--color-method-patch",
+  "--color-method-query",
+  "--color-method-ws",
+  "--color-method-grpc",
+  "--color-method-graphql",
+  "--radius-md",
+  "--radius-lg",
+  "--syntax-keyword",
+  "--syntax-string",
+  "--syntax-comment",
+  "--syntax-property",
+  "--syntax-punctuation",
+  "--syntax-operator",
+  "--syntax-number",
+  "--syntax-boolean",
+];
+
+function applyThemeTokens(tokens?: ThemeTokens) {
+  if (typeof document === "undefined" || !tokens) return;
+  const root = document.documentElement;
+  const appliedVars = new Set<string>();
+
+  if (tokens.ui) {
+    Object.entries(tokens.ui).forEach(([key, val]) => {
+      const varName = UI_CSS_VAR_MAP[key];
+      if (varName && val) {
+        root.style.setProperty(varName, String(val));
+        appliedVars.add(varName);
+      }
+    });
+  }
+
+  if (tokens.syntax) {
+    Object.entries(tokens.syntax).forEach(([key, val]) => {
+      const varName = SYNTAX_CSS_VAR_MAP[key];
+      if (varName && val) {
+        root.style.setProperty(varName, String(val));
+        appliedVars.add(varName);
+      }
+    });
+  }
+
+  // Remove stale variables that this theme does not define so old previews never leak
+  for (const varName of ALL_MANAGED_CSS_VARS) {
+    if (!appliedVars.has(varName)) {
+      root.style.removeProperty(varName);
+    }
+  }
+}
+
+function clearAllThemeOverrides() {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  for (const varName of ALL_MANAGED_CSS_VARS) {
+    root.style.removeProperty(varName);
+  }
+}
+
 
 export interface WorkspaceStore {
   environments: EnvironmentWithVariables[];
@@ -95,6 +174,7 @@ export interface WorkspaceStore {
   activeThemeId: string;
   activeTheme: Theme | null;
   previousActiveTheme: Theme | null;
+  previewedTheme: Theme | null;
 
   pendingTheme: Theme | null;
   pendingThemeId: string | null;
@@ -115,7 +195,7 @@ export interface WorkspaceStore {
   confirmInstallTheme: () => Promise<void>;
 
   openThemePicker: () => void;
-  closeThemePicker: (revert?: boolean) => void;
+  closeThemePicker: () => void;
   previewTheme: (theme: Theme) => void;
   revertThemePreview: () => void;
 }
@@ -137,6 +217,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   activeTheme: null,
   activeThemeId: "veyak-dark",
   previousActiveTheme: null,
+  previewedTheme: null,
 
   pendingTheme: null,
   pendingThemeId: null,
@@ -746,56 +827,56 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
 
   applyTheme: (theme: Theme) => {
     if (!theme?.tokens) return;
-
-    const root = document.documentElement;
-    const { ui, syntax } = theme.tokens;
-
-    if (ui) {
-      Object.entries(ui).forEach(([key, val]) => {
-        const varName = UI_CSS_VAR_MAP[key];
-        if (varName && val) {
-          root.style.setProperty(varName, String(val));
-        }
-      });
-    }
-
-    if (syntax) {
-      Object.entries(syntax).forEach(([key, val]) => {
-        const varName = SYNTAX_CSS_VAR_MAP[key];
-        if (varName && val) {
-          root.style.setProperty(varName, String(val));
-        }
-      });
-    }
-
-    set({ activeTheme: theme, activeThemeId: theme.id });
+    applyThemeTokens(theme.tokens);
+    set({
+      activeTheme: theme,
+      activeThemeId: theme.id,
+      previewedTheme: null,
+      previousActiveTheme: null,
+    });
   },
 
   previewTheme: (theme: Theme) => {
     if (!theme?.tokens) return;
-
-    const root = document.documentElement;
-    const { ui, syntax } = theme.tokens;
-
-    if (ui) {
-      Object.entries(ui).forEach(([key, val]) => {
-        const varName = UI_CSS_VAR_MAP[key];
-        if (varName && val) {
-          root.style.setProperty(varName, String(val));
-        }
-      });
+    if (!get().previousActiveTheme) {
+      const current =
+        get().activeTheme ||
+        get().themes.find((t) => t.id === get().activeThemeId) ||
+        get().themes[0] ||
+        null;
+      set({ previousActiveTheme: current });
     }
+    applyThemeTokens(theme.tokens);
+    set({ previewedTheme: theme });
+  },
 
-    if (syntax) {
-      Object.entries(syntax).forEach(([key, val]) => {
-        const varName = SYNTAX_CSS_VAR_MAP[key];
-        if (varName && val) {
-          root.style.setProperty(varName, String(val));
-        }
+  revertThemePreview: () => {
+    const prev =
+      get().previousActiveTheme ||
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0];
+
+    if (prev?.tokens) {
+      applyThemeTokens(prev.tokens);
+      set({
+        activeTheme: prev,
+        activeThemeId: prev.id,
+        previewedTheme: null,
+        previousActiveTheme: null,
+        pendingTheme: null,
+        pendingThemeId: null,
+      });
+    } else {
+      clearAllThemeOverrides();
+      set({
+        previewedTheme: null,
+        previousActiveTheme: null,
+        pendingTheme: null,
+        pendingThemeId: null,
       });
     }
   },
-
 
   setActiveThemeId: async (id: string) => {
     const target = get().themes.find((t) => t.id === id);
@@ -821,15 +902,13 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         activeTheme: targetTheme,
       });
 
-      if (targetTheme && !get().isInstallThemeModalOpen && !get().isThemePickerOpen) {
+      if (targetTheme && !get().isInstallThemeModalOpen && !get().isThemePickerOpen && !get().previewedTheme) {
         get().applyTheme(targetTheme);
       }
     } catch (err) {
       console.error("Failed to load desktop themes:", err);
     }
   },
-
-
 
   deleteCustomTheme: async (themeId: string) => {
     try {
@@ -860,8 +939,17 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   },
 
   openInstallThemeModal: async (themeOrId: Theme | string) => {
-    // Save current active theme to allow reverting if user cancels
-    const currentActive = get().activeTheme;
+    // If themes not yet loaded, load them so we know current active theme
+    if (get().themes.length === 0) {
+      await get().fetchThemes();
+    }
+
+    const currentActive =
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0] ||
+      null;
+
     set({ previousActiveTheme: currentActive });
 
     if (typeof themeOrId === "object" && themeOrId !== null) {
@@ -872,8 +960,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         isLoadingThemePreview: false,
         themeInstallError: null,
       });
-      // Live preview directly on the app!
-      get().applyTheme(themeOrId);
+      // Preview CSS variables only
+      get().previewTheme(themeOrId);
       return;
     }
 
@@ -892,8 +980,8 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         pendingTheme: preview,
         isLoadingThemePreview: false,
       });
-      // Live preview directly on the app!
-      get().applyTheme(preview);
+      // Preview CSS variables only
+      get().previewTheme(preview);
     } catch (err: any) {
       console.error("Failed to fetch theme preview:", err);
       set({
@@ -907,34 +995,27 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   },
 
   closeInstallThemeModal: () => {
-    // Revert live preview back to original theme if cancelled
-    const prev = get().previousActiveTheme;
-    if (prev) {
-      get().applyTheme(prev);
-    }
-
+    // Keep previewedTheme and pendingTheme in state so TitleBar can apply or revert!
     set({
       isInstallThemeModalOpen: false,
-      pendingTheme: null,
-      pendingThemeId: null,
       isInstallingTheme: false,
       isLoadingThemePreview: false,
       themeInstallError: null,
-      previousActiveTheme: null,
     });
   },
 
   confirmInstallTheme: async () => {
-    const { pendingTheme, pendingThemeId } = get();
-    const idToInstall = pendingTheme?.id || pendingThemeId;
+    const { pendingTheme, pendingThemeId, previewedTheme } = get();
+    const targetTheme = pendingTheme || previewedTheme;
+    const idToInstall = targetTheme?.id || pendingThemeId;
     if (!idToInstall) return;
 
     set({ isInstallingTheme: true, themeInstallError: null });
 
     try {
       let installedTheme: Theme;
-      if (pendingTheme) {
-        installedTheme = await invoke<Theme>("save_theme", { theme: pendingTheme });
+      if (targetTheme) {
+        installedTheme = await invoke<Theme>("save_theme", { theme: targetTheme });
       } else {
         installedTheme = await invoke<Theme>("install_theme", { id: idToInstall });
       }
@@ -949,10 +1030,11 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
         isInstallThemeModalOpen: false,
         pendingTheme: null,
         pendingThemeId: null,
+        previewedTheme: null,
+        previousActiveTheme: null,
         isInstallingTheme: false,
         isLoadingThemePreview: false,
         themeInstallError: null,
-        previousActiveTheme: null,
       });
     } catch (err: any) {
       console.error("Failed to install theme:", err);
@@ -970,33 +1052,26 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
     if (get().themes.length === 0) {
       await get().fetchThemes();
     }
+    const currentActive =
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0] ||
+      null;
+
     set({
       isThemePickerOpen: true,
-      previousActiveTheme: get().activeTheme,
+      previousActiveTheme: currentActive,
     });
   },
 
-
-  closeThemePicker: (revert = false) => {
-    if (revert) {
-      const prev = get().previousActiveTheme;
-      if (prev) {
-        get().applyTheme(prev);
-      }
-    }
+  closeThemePicker: () => {
+    // Keep previewedTheme active so TitleBar can apply or revert
     set({
       isThemePickerOpen: false,
-      previousActiveTheme: null,
     });
   },
-
-  revertThemePreview: () => {
-    const prev = get().previousActiveTheme;
-    if (prev) {
-      get().applyTheme(prev);
-    }
-  },
 }));
+
 
 
 

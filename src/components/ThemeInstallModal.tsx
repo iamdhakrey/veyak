@@ -341,7 +341,7 @@ export const ThemeInstallModal: React.FC<ThemeInstallModalProps> = ({
                 <div>
                   This theme is currently being live-previewed across your application.
                   Clicking <strong>Install & Apply</strong> will save it to your local
-                  configuration and activate it.
+                  configuration and activate it. You can also close this dialog to test it and apply or revert anytime from the top bar.
                 </div>
               </div>
             </>
