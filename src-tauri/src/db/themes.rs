@@ -83,4 +83,3 @@ pub async fn install_theme(dd: &DataDir, theme_id: &str) -> AppResult<Theme> {
     let theme = fetch_theme_preview(theme_id).await?;
     save_theme(dd, theme)
 }
-

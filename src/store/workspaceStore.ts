@@ -46,6 +46,11 @@ const ALL_MANAGED_CSS_VARS: string[] = [
   "--syntax-operator",
   "--syntax-number",
   "--syntax-boolean",
+  "--syntax-null",
+  "--syntax-function",
+  "--syntax-variable",
+  "--syntax-attribute",
+  "--syntax-class-name",
 ];
 
 function applyThemeTokens(tokens?: ThemeTokens) {

@@ -80,7 +80,10 @@ async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
         }
 
         if theme_id.is_empty() {
-            log::warn!("Theme install deep-link missing theme_id/id parameter: {}", raw_url);
+            log::warn!(
+                "Theme install deep-link missing theme_id/id parameter: {}",
+                raw_url
+            );
             return;
         }
 
@@ -255,4 +258,3 @@ pub fn run() {
         .run(tauri::generate_context!())
         .expect("error while running Veyak application");
 }
-

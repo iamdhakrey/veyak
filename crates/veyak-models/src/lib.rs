@@ -1150,7 +1150,8 @@ mod tests {
             }
         }"##;
 
-        let theme: Theme = serde_json::from_str(raw_json).expect("should deserialize partial JSON theme");
+        let theme: Theme =
+            serde_json::from_str(raw_json).expect("should deserialize partial JSON theme");
         assert_eq!(theme.id, "my-legacy-theme");
         assert_eq!(theme.name, "My Legacy Theme");
         assert_eq!(theme.tokens.ui.color_bg, "#121212");
@@ -1175,11 +1176,11 @@ tokens:
     colorBg: "#000000"
 "##;
 
-        let theme: Theme = serde_yaml::from_str(raw_yaml).expect("should deserialize partial YAML theme");
+        let theme: Theme =
+            serde_yaml::from_str(raw_yaml).expect("should deserialize partial YAML theme");
         assert_eq!(theme.id, "minimal-yaml-theme");
         assert_eq!(theme.tokens.ui.color_bg, "#000000");
         assert_eq!(theme.tokens.ui.color_panel, "#161B22");
         assert_eq!(theme.tokens.syntax.keyword, "#FF7B72");
     }
 }
-

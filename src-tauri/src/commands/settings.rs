@@ -44,4 +44,3 @@ pub async fn install_theme(state: State<'_, AppState>, id: String) -> AppResult<
 pub async fn save_theme(state: State<'_, AppState>, theme: Theme) -> AppResult<Theme> {
     crate::db::themes::save_theme(&state.data_dir, theme)
 }
-

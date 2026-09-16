@@ -364,4 +364,10 @@ export const SYNTAX_CSS_VAR_MAP: Record<string, string> = {
   operator: "--syntax-operator",
   number: "--syntax-number",
   boolean: "--syntax-boolean",
+  null: "--syntax-null",
+  function: "--syntax-function",
+  variable: "--syntax-variable",
+  attribute: "--syntax-attribute",
+  className: "--syntax-class-name",
+  class_name: "--syntax-class-name",
 };
