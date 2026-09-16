@@ -1,8 +1,8 @@
 use std::sync::Arc;
-use tauri::{Emitter, Manager, Window};
+use tauri::{AppHandle, Emitter, Manager, Window};
+use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_oauth::start;
-
-use tokio::sync::Mutex;
+use url::Url;
 
 use crate::commands::collections::{
     clone_collection, create_collection, create_folder, create_request, create_ws_request,
@@ -14,7 +14,7 @@ use crate::commands::environments::{
     create_environment, delete_environment, list_environments, list_variables, rename_environment,
     replace_variables, set_active_environment,
 };
-use crate::commands::settings::{get_settings, update_settings};
+use crate::commands::settings::{self, get_settings, update_settings};
 use crate::commands::workspaces::{
     create_workspace, delete_workspace, get_active_state, get_active_state_full, list_workspaces,
     rename_workspace, set_active_workspace,
@@ -25,6 +25,7 @@ use crate::ws::{
     ws_add_saved_message, ws_connect, ws_delete_saved_message, ws_disconnect,
     ws_list_saved_messages, ws_send, ws_update_saved_message,
 };
+use tokio::sync::Mutex;
 
 use crate::commands::auth::{self, PkceSessionState};
 use crate::commands::graphql;
@@ -57,17 +58,82 @@ async fn start_server(window: Window) -> Result<u16, String> {
     .map_err(|err| err.to_string())
 }
 
+async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
+    let parsed = match Url::parse(raw_url) {
+        Ok(u) => u,
+        Err(e) => {
+            log::warn!("Failed to parse deep link URL '{}': {}", raw_url, e);
+            return;
+        }
+    };
+
+    log::info!("Handling deep link: {}", parsed);
+    if parsed.scheme() == "veyak" && parsed.domain() == Some("theme") && parsed.path() == "/install"
+    {
+        let mut theme_id = String::new();
+
+        for (key, value) in parsed.query_pairs() {
+            match key.as_ref() {
+                "theme_id" | "id" => theme_id = value.to_string(),
+                _ => {}
+            }
+        }
+
+        if theme_id.is_empty() {
+            log::warn!(
+                "Theme install deep-link missing theme_id/id parameter: {}",
+                raw_url
+            );
+            return;
+        }
+
+        // Unminimize & bring window to front
+        if let Some(window) = app.get_webview_window("main") {
+            let _ = window.show();
+            let _ = window.unminimize();
+            let _ = window.set_focus();
+        }
+
+        // Pre-fetch theme preview from registry if possible
+        let theme_preview = crate::db::themes::fetch_theme_preview(&theme_id).await.ok();
+
+        // Forward to frontend for confirmation (DO NOT write to disk or apply yet)
+        let _ = app.emit(
+            "deep-link://theme-install",
+            serde_json::json!({
+                "id": theme_id,
+                "theme": theme_preview,
+            }),
+        );
+    }
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(
+            tauri_plugin_log::Builder::new()
+                .level(tauri_plugin_log::log::LevelFilter::Info)
+                .build(),
+        )
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_store::Builder::new().build())
         .plugin(tauri_plugin_oauth::init())
+        .plugin(tauri_plugin_deep_link::init())
+        .plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            if let Some(url) = argv.into_iter().find(|arg| arg.starts_with("veyak://")) {
+                let app_handle = app.clone();
+                tauri::async_runtime::spawn(async move {
+                    handle_deep_link(&app_handle, &url).await;
+                });
+            }
+        }))
         .setup(|app| {
             let app_handle = app.handle().clone();
+
             let data_dir = app_handle
                 .path()
                 .app_data_dir()
@@ -89,6 +155,17 @@ pub fn run() {
             if let Some(window) = app_handle.get_webview_window("main") {
                 let _ = window.set_decorations(true);
             }
+
+            let app_handle_deep = app_handle.clone();
+            let _ = app.deep_link().on_open_url(move |event| {
+                for url in event.urls() {
+                    let app_handle = app_handle_deep.clone();
+                    let url_str = url.to_string();
+                    tauri::async_runtime::spawn(async move {
+                        handle_deep_link(&app_handle, &url_str).await;
+                    });
+                }
+            });
 
             Ok(())
         })
@@ -170,6 +247,13 @@ pub fn run() {
             graphql::graphql_unsubscribe,
             // fonts
             fonts::get_system_fonts,
+            // Themes
+            settings::list_themes,
+            settings::delete_theme,
+            settings::set_active_theme,
+            settings::fetch_theme_preview,
+            settings::install_theme,
+            settings::save_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Veyak application");

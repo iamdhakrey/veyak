@@ -8,12 +8,17 @@ import { useSettingsStore, DEFAULT_FONT_SETTINGS } from "./store/settingStore";
 import { useKeyboardShortcuts } from "./hooks/useKeyboardShortcuts";
 import { useAuth0Desktop } from "./hooks/useAuth0Desktop";
 import { useMobileDetect } from "./hooks/useMobileDetect";
-import { SettingsPanel } from "./components/SettingsPanel";
+import { SettingsPanel } from "./components/Settings/SettingsPanel";
 import { EnvironmentModal } from "./components/EnvironmentModal";
+import { ThemeInstallModal } from "./components/ThemeInstallModal";
+import { ThemePickerModal } from "./components/ThemePickerModal";
 import { Menu } from "lucide-react";
+
 import { UpdaterOverlay } from "./components/UpdaterOverlay";
-import Titlebar from "./components/TitleBar/TitleBar";
+import Titlebar from "./components/TitleBar";
 import { NewReqSaveModal } from "./components/NewRequestSaveModal";
+import { useWorkspaceStore } from "./store/workspaceStore";
+import { listen } from "@tauri-apps/api/event";
 
 export default function App() {
   useAuth0Desktop();
@@ -25,6 +30,40 @@ export default function App() {
   const initWsListener = useVartaStore((s) => s.initWsListener);
   const initGrpcListener = useVartaStore((s) => s.initGrpcListener);
   const initGraphqlListener = useVartaStore((s) => s.initGraphqlListener);
+
+  const fetchThemes = useWorkspaceStore((s) => s.fetchThemes);
+  const openInstallThemeModal = useWorkspaceStore((s) => s.openInstallThemeModal);
+
+  useEffect(() => {
+    // 1. Initial hydration and CSS token application
+    fetchThemes();
+
+    // 2. Handle deep link payload triggered from veyak://theme/install
+    const unlistenPromise = listen<{ id?: string; theme?: any } | string>(
+      "deep-link://theme-install",
+      (event) => {
+        try {
+          const payload = event.payload;
+          if (typeof payload === "object" && payload !== null) {
+            if (payload.theme) {
+              openInstallThemeModal(payload.theme);
+            } else if (payload.id) {
+              openInstallThemeModal(payload.id);
+            }
+          } else if (typeof payload === "string") {
+            openInstallThemeModal(payload);
+          }
+        } catch (err) {
+          console.error("Deep link theme installation handler failed:", err);
+        }
+      },
+    );
+
+    return () => {
+      unlistenPromise.then((unlisten) => unlisten());
+    };
+  }, [fetchThemes, openInstallThemeModal]);
+
 
   // Initialize Tauri WS, gRPC & GraphQL event listeners on mount
   useEffect(() => {
@@ -113,8 +152,12 @@ export default function App() {
           {/* Mount the Environment Modal here */}
           <EnvironmentModal isMobile={isMobile} />
           <NewReqSaveModal isMobile={isMobile} />
+          <ThemeInstallModal isMobile={isMobile} />
+          <ThemePickerModal isMobile={isMobile} />
         </div>
       </div>
     </>
   );
 }
+
+

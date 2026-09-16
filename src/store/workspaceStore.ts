@@ -1,13 +1,99 @@
 import { create } from "zustand";
 import { invoke } from "@tauri-apps/api/core";
-import { Workspace } from "../types";
+import { SYNTAX_CSS_VAR_MAP, UI_CSS_VAR_MAP, Workspace } from "../types";
 import {
   Collection,
   CollectionTree,
   EnvironmentVariable,
   EnvironmentWithVariables,
   AdditionType,
+  ActiveState,
+  Theme,
+  ThemeTokens,
 } from "@veyak-internal/models";
+
+const ALL_MANAGED_CSS_VARS: string[] = [
+  "--color-bg",
+  "--color-panel",
+  "--color-panel-raised",
+  "--color-border",
+  "--color-borderMuted",
+  "--color-text-primary",
+  "--color-text-secondary",
+  "--color-text-muted",
+  "--color-primary",
+  "--color-primary-hover",
+  "--color-secondary",
+  "--color-success",
+  "--color-error",
+  "--color-warning",
+  "--color-method-get",
+  "--color-method-post",
+  "--color-method-put",
+  "--color-method-delete",
+  "--color-method-patch",
+  "--color-method-query",
+  "--color-method-ws",
+  "--color-method-grpc",
+  "--color-method-graphql",
+  "--radius-md",
+  "--radius-lg",
+  "--syntax-keyword",
+  "--syntax-string",
+  "--syntax-comment",
+  "--syntax-property",
+  "--syntax-punctuation",
+  "--syntax-operator",
+  "--syntax-number",
+  "--syntax-boolean",
+  "--syntax-null",
+  "--syntax-function",
+  "--syntax-variable",
+  "--syntax-attribute",
+  "--syntax-class-name",
+];
+
+function applyThemeTokens(tokens?: ThemeTokens) {
+  if (typeof document === "undefined" || !tokens) return;
+  const root = document.documentElement;
+  const appliedVars = new Set<string>();
+
+  if (tokens.ui) {
+    Object.entries(tokens.ui).forEach(([key, val]) => {
+      const varName = UI_CSS_VAR_MAP[key];
+      if (varName && val) {
+        root.style.setProperty(varName, String(val));
+        appliedVars.add(varName);
+      }
+    });
+  }
+
+  if (tokens.syntax) {
+    Object.entries(tokens.syntax).forEach(([key, val]) => {
+      const varName = SYNTAX_CSS_VAR_MAP[key];
+      if (varName && val) {
+        root.style.setProperty(varName, String(val));
+        appliedVars.add(varName);
+      }
+    });
+  }
+
+  // Remove stale variables that this theme does not define so old previews never leak
+  for (const varName of ALL_MANAGED_CSS_VARS) {
+    if (!appliedVars.has(varName)) {
+      root.style.removeProperty(varName);
+    }
+  }
+}
+
+function clearAllThemeOverrides() {
+  if (typeof document === "undefined") return;
+  const root = document.documentElement;
+  for (const varName of ALL_MANAGED_CSS_VARS) {
+    root.style.removeProperty(varName);
+  }
+}
+
 
 export interface WorkspaceStore {
   environments: EnvironmentWithVariables[];
@@ -85,6 +171,38 @@ export interface WorkspaceStore {
     variables: EnvironmentVariable[],
   ) => Promise<void>;
   setActiveEnvironment: (id: string | null) => Promise<void>;
+
+
+  // Theme Store
+
+  themes: Theme[];
+  activeThemeId: string;
+  activeTheme: Theme | null;
+  previousActiveTheme: Theme | null;
+  previewedTheme: Theme | null;
+
+  pendingTheme: Theme | null;
+  pendingThemeId: string | null;
+  isInstallThemeModalOpen: boolean;
+  isInstallingTheme: boolean;
+  isLoadingThemePreview: boolean;
+  themeInstallError: string | null;
+
+  isThemePickerOpen: boolean;
+
+  applyTheme: (theme: Theme) => void;
+  setActiveThemeId: (id: string) => Promise<void>;
+  fetchThemes: () => Promise<void>;
+  deleteCustomTheme: (themeId: string) => Promise<void>;
+
+  openInstallThemeModal: (themeOrId: Theme | string) => Promise<void>;
+  closeInstallThemeModal: () => void;
+  confirmInstallTheme: () => Promise<void>;
+
+  openThemePicker: () => void;
+  closeThemePicker: () => void;
+  previewTheme: (theme: Theme) => void;
+  revertThemePreview: () => void;
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
@@ -100,6 +218,23 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   error: null,
   activeEnvironmentId: null,
   environments: [],
+  themes: [],
+  activeTheme: null,
+  activeThemeId: "veyak-dark",
+  previousActiveTheme: null,
+  previewedTheme: null,
+
+  pendingTheme: null,
+  pendingThemeId: null,
+  isInstallThemeModalOpen: false,
+  isInstallingTheme: false,
+  isLoadingThemePreview: false,
+  themeInstallError: null,
+
+  isThemePickerOpen: false,
+
+
+
 
   additionTypes: [],
   fetchAdditionTypes: async () => {
@@ -213,11 +348,7 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
 
   getActiveState: async () => {
     try {
-      const fullState = await invoke<{
-        activeWorkspaceId?: string;
-        activeEnvironmentId?: string;
-        activeCollectionId?: string;
-      }>("get_active_state_full");
+      const fullState = await invoke<ActiveState>("get_active_state_full");
       if (fullState.activeWorkspaceId) {
         set({ activeWorkspaceId: fullState.activeWorkspaceId });
       }
@@ -226,6 +357,10 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       }
       if (fullState.activeCollectionId) {
         set({ activeCollectionId: fullState.activeCollectionId });
+      }
+      if (fullState.activeThemeId) {
+        set({ activeThemeId: fullState.activeThemeId });
+        get().fetchThemes();
       }
       console.log("Restored active state:", fullState);
     } catch (err) {
@@ -692,4 +827,256 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       console.error("Failed to persist active environment:", error);
     }
   },
+
+  //  Themes 
+
+  applyTheme: (theme: Theme) => {
+    if (!theme?.tokens) return;
+    applyThemeTokens(theme.tokens);
+    set({
+      activeTheme: theme,
+      activeThemeId: theme.id,
+      previewedTheme: null,
+      previousActiveTheme: null,
+    });
+  },
+
+  previewTheme: (theme: Theme) => {
+    if (!theme?.tokens) return;
+    if (!get().previousActiveTheme) {
+      const current =
+        get().activeTheme ||
+        get().themes.find((t) => t.id === get().activeThemeId) ||
+        get().themes[0] ||
+        null;
+      set({ previousActiveTheme: current });
+    }
+    applyThemeTokens(theme.tokens);
+    set({ previewedTheme: theme });
+  },
+
+  revertThemePreview: () => {
+    const prev =
+      get().previousActiveTheme ||
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0];
+
+    if (prev?.tokens) {
+      applyThemeTokens(prev.tokens);
+      set({
+        activeTheme: prev,
+        activeThemeId: prev.id,
+        previewedTheme: null,
+        previousActiveTheme: null,
+        pendingTheme: null,
+        pendingThemeId: null,
+      });
+    } else {
+      clearAllThemeOverrides();
+      set({
+        previewedTheme: null,
+        previousActiveTheme: null,
+        pendingTheme: null,
+        pendingThemeId: null,
+      });
+    }
+  },
+
+  setActiveThemeId: async (id: string) => {
+    const target = get().themes.find((t) => t.id === id);
+    if (target) {
+      get().applyTheme(target);
+      await invoke("set_active_theme", { id: id }).catch((err) =>
+        console.error("Failed to persist active theme:", err),
+      );
+    }
+  },
+
+  fetchThemes: async () => {
+    try {
+      const activeThemeId = get().activeThemeId;
+      const themes = await invoke<Theme[]>("list_themes");
+
+      const targetTheme =
+        themes.find((t) => t.id === activeThemeId) || themes[0] || null;
+
+      set({
+        themes,
+        activeThemeId: targetTheme ? targetTheme.id : activeThemeId,
+        activeTheme: targetTheme,
+      });
+
+      if (targetTheme && !get().isInstallThemeModalOpen && !get().isThemePickerOpen && !get().previewedTheme) {
+        get().applyTheme(targetTheme);
+      }
+    } catch (err) {
+      console.error("Failed to load desktop themes:", err);
+    }
+  },
+
+  deleteCustomTheme: async (themeId: string) => {
+    try {
+      await invoke("delete_theme", { themeId });
+      set((state) => {
+        const remaining = state.themes.filter((t) => t.id !== themeId);
+        const nextActive =
+          state.activeThemeId === themeId
+            ? remaining[0] || null
+            : state.activeTheme;
+
+        if (nextActive && state.activeThemeId === themeId) {
+          get().applyTheme(nextActive);
+          invoke("set_active_theme", { themeId: nextActive.id }).catch(
+            () => { },
+          );
+        }
+
+        return {
+          themes: remaining,
+          activeTheme: nextActive,
+          activeThemeId: nextActive?.id ?? "",
+        };
+      });
+    } catch (err) {
+      console.error("Failed to delete custom theme:", err);
+    }
+  },
+
+  openInstallThemeModal: async (themeOrId: Theme | string) => {
+    // If themes not yet loaded, load them so we know current active theme
+    if (get().themes.length === 0) {
+      await get().fetchThemes();
+    }
+
+    const currentActive =
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0] ||
+      null;
+
+    set({ previousActiveTheme: currentActive });
+
+    if (typeof themeOrId === "object" && themeOrId !== null) {
+      set({
+        pendingTheme: themeOrId,
+        pendingThemeId: themeOrId.id,
+        isInstallThemeModalOpen: true,
+        isLoadingThemePreview: false,
+        themeInstallError: null,
+      });
+      // Preview CSS variables only
+      get().previewTheme(themeOrId);
+      return;
+    }
+
+    const themeId = themeOrId;
+    set({
+      pendingTheme: null,
+      pendingThemeId: themeId,
+      isInstallThemeModalOpen: true,
+      isLoadingThemePreview: true,
+      themeInstallError: null,
+    });
+
+    try {
+      const preview = await invoke<Theme>("fetch_theme_preview", { id: themeId });
+      set({
+        pendingTheme: preview,
+        isLoadingThemePreview: false,
+      });
+      // Preview CSS variables only
+      get().previewTheme(preview);
+    } catch (err: any) {
+      console.error("Failed to fetch theme preview:", err);
+      set({
+        isLoadingThemePreview: false,
+        themeInstallError:
+          typeof err === "string"
+            ? err
+            : err?.message || `Failed to fetch theme "${themeId}" from registry`,
+      });
+    }
+  },
+
+  closeInstallThemeModal: () => {
+    // Keep previewedTheme and pendingTheme in state so TitleBar can apply or revert!
+    set({
+      isInstallThemeModalOpen: false,
+      isInstallingTheme: false,
+      isLoadingThemePreview: false,
+      themeInstallError: null,
+    });
+  },
+
+  confirmInstallTheme: async () => {
+    const { pendingTheme, pendingThemeId, previewedTheme } = get();
+    const targetTheme = pendingTheme || previewedTheme;
+    const idToInstall = targetTheme?.id || pendingThemeId;
+    if (!idToInstall) return;
+
+    set({ isInstallingTheme: true, themeInstallError: null });
+
+    try {
+      let installedTheme: Theme;
+      if (targetTheme) {
+        installedTheme = await invoke<Theme>("save_theme", { theme: targetTheme });
+      } else {
+        installedTheme = await invoke<Theme>("install_theme", { id: idToInstall });
+      }
+
+      // Refresh themes list from disk
+      await get().fetchThemes();
+
+      // Persist active theme in app state and keep applied
+      await get().setActiveThemeId(installedTheme.id);
+
+      set({
+        isInstallThemeModalOpen: false,
+        pendingTheme: null,
+        pendingThemeId: null,
+        previewedTheme: null,
+        previousActiveTheme: null,
+        isInstallingTheme: false,
+        isLoadingThemePreview: false,
+        themeInstallError: null,
+      });
+    } catch (err: any) {
+      console.error("Failed to install theme:", err);
+      set({
+        isInstallingTheme: false,
+        themeInstallError:
+          typeof err === "string"
+            ? err
+            : err?.message || "Failed to install theme to disk",
+      });
+    }
+  },
+
+  openThemePicker: async () => {
+    if (get().themes.length === 0) {
+      await get().fetchThemes();
+    }
+    const currentActive =
+      get().activeTheme ||
+      get().themes.find((t) => t.id === get().activeThemeId) ||
+      get().themes[0] ||
+      null;
+
+    set({
+      isThemePickerOpen: true,
+      previousActiveTheme: currentActive,
+    });
+  },
+
+  closeThemePicker: () => {
+    // Keep previewedTheme active so TitleBar can apply or revert
+    set({
+      isThemePickerOpen: false,
+    });
+  },
 }));
+
+
+
+
