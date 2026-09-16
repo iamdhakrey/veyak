@@ -7,6 +7,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { ExternalLink, Palette, Trash2, Type } from "lucide-react";
 import { ToggleRow } from "./ToggleRow";
 import { useWorkspaceStore } from "../../store/workspaceStore";
+import { FontDropdown } from "./FontDropdown";
 
 export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
 
@@ -174,22 +175,13 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
             <Type className="w-4 h-4 text-text-secondary" />
             App Font Family
           </label>
-          <select
+          <FontDropdown
             value={appFontFamily}
-            onChange={(e) => setAppFontFamily(e.target.value)}
-            disabled={isLoadingFonts}
-            className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
-          >
-            {isLoadingFonts ? (
-              <option>Loading system fonts...</option>
-            ) : (
-              availableFonts.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))
-            )}
-          </select>
+            onChange={setAppFontFamily}
+            fonts={availableFonts}
+            isLoading={isLoadingFonts}
+            placeholder="Select App Font..."
+          />
         </div>
       </section>
 
@@ -206,31 +198,14 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
             <Type className="w-4 h-4 text-text-secondary" />
             Font Family
           </label>
-          <select
-            value={customFontPath ? "custom" : fontFamily}
-            onChange={(e) => {
-              if (e.target.value !== "custom") {
-                setFontFamily(e.target.value);
-              }
-            }}
-            disabled={isLoadingFonts}
-            className="input-shell flex-1 bg-panel text-sm disabled:opacity-50"
-          >
-            {customFontPath && (
-              <option value="custom" disabled>
-                {fontFamily} (Custom File)
-              </option>
-            )}
-            {isLoadingFonts ? (
-              <option>Loading system fonts...</option>
-            ) : (
-              availableFonts.map((f) => (
-                <option key={f} value={f}>
-                  {f}
-                </option>
-              ))
-            )}
-          </select>
+          <FontDropdown
+            value={fontFamily}
+            onChange={setFontFamily}
+            fonts={availableFonts}
+            isLoading={isLoadingFonts}
+            placeholder="Select Editor Font..."
+            customLabel={customFontPath ? `${fontFamily} (Custom File)` : undefined}
+          />
         </div>
 
         <div
