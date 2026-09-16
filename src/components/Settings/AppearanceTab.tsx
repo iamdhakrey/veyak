@@ -149,7 +149,7 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
 
           <div className="mt-1">
             <a
-              href="https://themes.veyak.iamdhakrey.dev"
+              href="https://veyak.iamdhakrey.dev/themes"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 text-xs text-primary hover:text-primary-hover hover:underline transition-colors font-medium"
