@@ -10,11 +10,10 @@ import {
   Sparkles,
   User,
   Tag,
-  Code2,
-  FileCode,
 } from "lucide-react";
 
 interface ThemeInstallModalProps {
+
   isMobile?: boolean;
 }
 
@@ -54,7 +53,7 @@ export const ThemeInstallModal: React.FC<ThemeInstallModalProps> = ({
   if (!isInstallThemeModalOpen) return null;
 
   const ui = pendingTheme?.tokens?.ui;
-  const syntax = pendingTheme?.tokens?.syntax;
+
 
   return (
     <div
@@ -336,81 +335,19 @@ export const ThemeInstallModal: React.FC<ThemeInstallModalProps> = ({
                 </div>
               )}
 
-              {/* Code & UI Preview */}
-              {syntax && ui && (
-                <div className="space-y-2">
-                  <span className="text-[11px] font-bold tracking-wider text-text-muted uppercase flex items-center gap-1.5">
-                    <Code2 className="w-3.5 h-3.5 text-primary" />
-                    Editor Code Preview
-                  </span>
-
-                  <div
-                    className="p-3.5 rounded-lg border font-mono text-xs leading-relaxed transition-all shadow-inner overflow-x-auto"
-                    style={{
-                      backgroundColor: ui.colorBg,
-                      borderColor: ui.colorBorder,
-                    }}
-                  >
-                    <div className="flex items-center gap-2 pb-2 mb-2 border-b border-white/5 text-[10px] text-text-muted">
-                      <FileCode className="w-3 h-3" />
-                      <span>api_client.ts</span>
-                    </div>
-                    <div>
-                      <span style={{ color: syntax.keyword }}>import</span>{" "}
-                      <span style={{ color: syntax.property }}>
-                        &#123; createClient &#125;
-                      </span>{" "}
-                      <span style={{ color: syntax.keyword }}>from</span>{" "}
-                      <span style={{ color: syntax.string }}>
-                        "@veyak/sdk"
-                      </span>
-                      ;
-                    </div>
-                    <div className="mt-1">
-                      <span style={{ color: syntax.keyword }}>async</span>{" "}
-                      <span style={{ color: syntax.keyword }}>function</span>{" "}
-                      <span style={{ color: syntax.function }}>fetchData</span>
-                      () &#123;
-                    </div>
-                    <div className="pl-4">
-                      <span style={{ color: syntax.keyword }}>const</span>{" "}
-                      <span style={{ color: syntax.variable }}>res</span>{" "}
-                      <span style={{ color: syntax.operator }}>=</span>{" "}
-                      <span style={{ color: syntax.keyword }}>await</span>{" "}
-                      <span style={{ color: syntax.function }}>client</span>.
-                      <span style={{ color: ui.methodGet }}>get</span>(
-                      <span style={{ color: syntax.string }}>
-                        "/api/v1/workspaces"
-                      </span>
-                      );
-                    </div>
-                    <div className="pl-4">
-                      <span style={{ color: syntax.keyword }}>return</span>{" "}
-                      <span style={{ color: syntax.variable }}>res</span>.
-                      <span style={{ color: syntax.property }}>data</span>;
-                    </div>
-                    <div>&#125;</div>
-                    <div className="mt-1">
-                      <span style={{ color: syntax.comment }}>
-                        // 200 OK • 18ms latency
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
               {/* Security confirmation notice */}
               <div className="p-3 rounded-lg bg-panel border border-border flex items-start gap-2.5 text-[11px] text-text-secondary">
                 <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div>
-                  This theme was opened via an external link. Confirming will
-                  write the theme file to your local configuration and apply it
-                  to your application workspace.
+                  This theme is currently being live-previewed across your application.
+                  Clicking <strong>Install & Apply</strong> will save it to your local
+                  configuration and activate it.
                 </div>
               </div>
             </>
           )}
         </div>
+
 
         {/* Action Footer */}
         <div className="flex items-center justify-end gap-2.5 px-5 py-3 border-t border-border bg-panel shrink-0">

@@ -7,6 +7,7 @@ import {
   Zap,
   FileText,
   ChevronRight,
+  Palette,
 } from "lucide-react";
 import { useVartaStore } from "../store/vartaStore";
 import { useSettingsStore } from "../store/settingStore";
@@ -55,6 +56,7 @@ export default function CommandPalette({
   const toggleHistory = useVartaStore((s) => s.toggleHistory);
   const setSettingsOpen = useSettingsStore((s) => s.setSettingsOpen);
   const collectionTrees = useWorkspaceStore((s) => s.collectionTrees);
+  const openThemePicker = useWorkspaceStore((s) => s.openThemePicker);
 
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
@@ -73,6 +75,17 @@ export default function CommandPalette({
         action: () => newTab(),
       },
       {
+        id: "action-theme-picker",
+        category: "actions",
+        label: "Preferences: Color Theme",
+        hint: isMobile ? undefined : "Ctrl+K Ctrl+T",
+        icon: <Palette className="w-3.5 h-3.5" />,
+        action: () => {
+          toggle(false);
+          openThemePicker();
+        },
+      },
+      {
         id: "action-settings",
         category: "actions",
         label: "Open Settings",
@@ -88,6 +101,7 @@ export default function CommandPalette({
         action: () => toggleHistory(),
       },
     ];
+
 
     // Flatten all requests from all collections
     const requestItems: PaletteItem[] = [];

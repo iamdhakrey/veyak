@@ -9,6 +9,7 @@ import { ToggleRow } from "./ToggleRow";
 import { useWorkspaceStore } from "../../store/workspaceStore";
 
 export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
+
   isMobile = false,
 }) => {
   // Font Store
@@ -145,41 +146,6 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
             )}
           </div>
 
-          {/* Miniature Editor Preview */}
-          {selectedTheme && (
-            <div
-              className="p-3 rounded-md border border-border/70 font-mono text-xs leading-relaxed"
-              style={{
-                backgroundColor: selectedTheme.tokens.ui.colorBg,
-                borderColor: selectedTheme.tokens.ui.colorBorder,
-              }}
-            >
-              <div>
-                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>
-                  const
-                </span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.property }}>
-                  cluster
-                </span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.operator }}>
-                  =
-                </span>{" "}
-                <span style={{ color: selectedTheme.tokens.syntax.keyword }}>
-                  await
-                </span>{" "}
-                <span style={{ color: selectedTheme.tokens.ui.methodGet }}>
-                  getClusterNodes
-                </span>
-                ();
-              </div>
-              <div>
-                <span style={{ color: selectedTheme.tokens.syntax.comment }}>
-                  // latency: 12.4ms • 200 OK
-                </span>
-              </div>
-            </div>
-          )}
-
           <div className="mt-1">
             <a
               href="https://themes.veyak.iamdhakrey.dev"
@@ -193,6 +159,7 @@ export const AppearanceTab: React.FC<{ isMobile?: boolean }> = ({
           </div>
         </div>
       </section>
+
 
       <div className="h-px bg-borderMuted" />
 

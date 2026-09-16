@@ -3,6 +3,7 @@ import React from "react";
 
 const SHORTCUT_LIST = [
   { action: "Open Command Palette", keys: ["Ctrl", "P"] },
+  { action: "Quick Theme Switcher", keys: ["Ctrl", "K", "Ctrl", "T"] },
   { action: "New Request Tab", keys: ["Ctrl", "T"] },
   { action: "Send Request", keys: ["Ctrl", "↵"] },
   { action: "Save Request", keys: ["Ctrl", "S"] },
@@ -10,6 +11,7 @@ const SHORTCUT_LIST = [
   { action: "Toggle History", keys: ["Ctrl", "H"] },
   { action: "Close Modal / Palette", keys: ["Esc"] },
 ];
+
 
 export const ShortcutsTab: React.FC<{ isMobile?: boolean }> = ({
   isMobile = false,

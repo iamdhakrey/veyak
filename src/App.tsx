@@ -11,7 +11,9 @@ import { useMobileDetect } from "./hooks/useMobileDetect";
 import { SettingsPanel } from "./components/Settings/SettingsPanel";
 import { EnvironmentModal } from "./components/EnvironmentModal";
 import { ThemeInstallModal } from "./components/ThemeInstallModal";
+import { ThemePickerModal } from "./components/ThemePickerModal";
 import { Menu } from "lucide-react";
+
 import { UpdaterOverlay } from "./components/UpdaterOverlay";
 import Titlebar from "./components/TitleBar";
 import { NewReqSaveModal } from "./components/NewRequestSaveModal";
@@ -151,9 +153,11 @@ export default function App() {
           <EnvironmentModal isMobile={isMobile} />
           <NewReqSaveModal isMobile={isMobile} />
           <ThemeInstallModal isMobile={isMobile} />
+          <ThemePickerModal isMobile={isMobile} />
         </div>
       </div>
     </>
   );
 }
+
 
