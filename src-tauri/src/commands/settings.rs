@@ -29,3 +29,19 @@ pub async fn delete_theme(state: State<'_, AppState>, id: String) -> AppResult<(
 pub async fn set_active_theme(state: State<'_, AppState>, id: String) -> AppResult<()> {
     crate::db::app_state::set_active_theme(&state.data_dir, &id)
 }
+
+#[tauri::command]
+pub async fn fetch_theme_preview(id: String) -> AppResult<Theme> {
+    crate::db::themes::fetch_theme_preview(&id).await
+}
+
+#[tauri::command]
+pub async fn install_theme(state: State<'_, AppState>, id: String) -> AppResult<Theme> {
+    crate::db::themes::install_theme(&state.data_dir, &id).await
+}
+
+#[tauri::command]
+pub async fn save_theme(state: State<'_, AppState>, theme: Theme) -> AppResult<Theme> {
+    crate::db::themes::save_theme(&state.data_dir, theme)
+}
+

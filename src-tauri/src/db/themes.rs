@@ -1,18 +1,21 @@
 use std::path::PathBuf;
 
-use veyak_db::{read_yaml, read_yaml_vec, write_yaml, DataDir};
+use veyak_db::{read_yaml, write_yaml, DataDir};
 use veyak_error::{AppError, AppResult};
 use veyak_models::Theme;
 
 pub fn list_themes(dd: &DataDir) -> AppResult<Vec<Theme>> {
     let mut themes: Vec<Theme> = Vec::new();
-    // walk to the dir and read the yaml files.
-    for entry in std::fs::read_dir(&dd.themes_path())? {
-        let entry = entry?;
-        let path = entry.path();
-        if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("yaml") {
-            let theme: Theme = read_yaml(&path)?;
-            themes.push(theme);
+    let themes_dir = dd.themes_path();
+    if themes_dir.exists() {
+        for entry in std::fs::read_dir(&themes_dir)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() && path.extension().and_then(|s| s.to_str()) == Some("yaml") {
+                if let Ok(theme) = read_yaml::<Theme>(&path) {
+                    themes.push(theme);
+                }
+            }
         }
     }
 
@@ -40,36 +43,44 @@ pub fn delete_theme(dd: &DataDir, id: &str) -> AppResult<()> {
             "built-in themes can't be deleted".to_string(),
         ));
     }
-    let mut themes: Vec<Theme> = read_yaml_vec(&dd.themes_path())?;
-    themes.retain(|t| t.id != id);
-    write_yaml(&dd.themes_path(), &themes)
+    let theme_file: PathBuf = dd.themes_path().join(format!("{id}.yaml"));
+    if theme_file.exists() {
+        std::fs::remove_file(&theme_file)?;
+    }
+    Ok(())
 }
 
-pub async fn install_theme(dd: &DataDir, theme_id: &str) -> AppResult<()> {
+pub async fn fetch_theme_preview(theme_id: &str) -> AppResult<Theme> {
     const REGISTRY_URL: &str = "https://veyak.iamdhakrey.dev/themes/registry.json";
 
-    // 1. Fetch registry asynchronously
     let response = reqwest::get(REGISTRY_URL)
         .await
-        .map_err(|e| AppError::Invalid(e.to_string()))?;
+        .map_err(|e| AppError::Invalid(format!("Failed to connect to theme registry: {e}")))?;
     let registry: Vec<Theme> = response
         .json()
         .await
-        .map_err(|e| AppError::Invalid(e.to_string()))?;
+        .map_err(|e| AppError::Invalid(format!("Failed to parse theme registry manifest: {e}")))?;
 
-    // 2. Locate matching theme manifest
     let theme = registry
         .into_iter()
         .find(|t| t.id == theme_id)
-        .ok_or_else(|| AppError::NotFound(format!("theme '{theme_id}'")))?;
+        .ok_or_else(|| AppError::NotFound(format!("theme '{theme_id}' not found in registry")))?;
 
-    // 3. Resolve destination file path inside the themes directory
-    let theme_file: PathBuf = dd.themes_path().join(format!("{theme_id}.yaml"));
+    Ok(theme)
+}
 
-    // 4. Ensure destination directory exists before writing
+pub fn save_theme(dd: &DataDir, mut theme: Theme) -> AppResult<Theme> {
+    theme.is_builtin = false;
+    let theme_file: PathBuf = dd.themes_path().join(format!("{}.yaml", theme.id));
     if let Some(parent) = theme_file.parent() {
         std::fs::create_dir_all(parent)?;
     }
-    // 5. Persist to disk
-    write_yaml(&theme_file, &theme)
+    write_yaml(&theme_file, &theme)?;
+    Ok(theme)
 }
+
+pub async fn install_theme(dd: &DataDir, theme_id: &str) -> AppResult<Theme> {
+    let theme = fetch_theme_preview(theme_id).await?;
+    save_theme(dd, theme)
+}
+

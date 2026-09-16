@@ -95,10 +95,21 @@ export interface WorkspaceStore {
   activeThemeId: string;
   activeTheme: Theme | null;
 
+  pendingTheme: Theme | null;
+  pendingThemeId: string | null;
+  isInstallThemeModalOpen: boolean;
+  isInstallingTheme: boolean;
+  isLoadingThemePreview: boolean;
+  themeInstallError: string | null;
+
   applyTheme: (theme: Theme) => void;
   setActiveThemeId: (id: string) => Promise<void>;
   fetchThemes: () => Promise<void>;
   deleteCustomTheme: (themeId: string) => Promise<void>;
+
+  openInstallThemeModal: (themeOrId: Theme | string) => Promise<void>;
+  closeInstallThemeModal: () => void;
+  confirmInstallTheme: () => Promise<void>;
 }
 
 export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
@@ -117,6 +128,14 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
   themes: [],
   activeTheme: null,
   activeThemeId: "veyak-dark",
+
+  pendingTheme: null,
+  pendingThemeId: null,
+  isInstallThemeModalOpen: false,
+  isInstallingTheme: false,
+  isLoadingThemePreview: false,
+  themeInstallError: null,
+
 
 
   additionTypes: [],
@@ -806,4 +825,89 @@ export const useWorkspaceStore = create<WorkspaceStore>((set, get) => ({
       console.error("Failed to delete custom theme:", err);
     }
   },
+
+  openInstallThemeModal: async (themeOrId: Theme | string) => {
+    if (typeof themeOrId === "object" && themeOrId !== null) {
+      set({
+        pendingTheme: themeOrId,
+        pendingThemeId: themeOrId.id,
+        isInstallThemeModalOpen: true,
+        isLoadingThemePreview: false,
+        themeInstallError: null,
+      });
+      return;
+    }
+
+    const themeId = themeOrId;
+    set({
+      pendingTheme: null,
+      pendingThemeId: themeId,
+      isInstallThemeModalOpen: true,
+      isLoadingThemePreview: true,
+      themeInstallError: null,
+    });
+
+    try {
+      const preview = await invoke<Theme>("fetch_theme_preview", { id: themeId });
+      set({
+        pendingTheme: preview,
+        isLoadingThemePreview: false,
+      });
+    } catch (err: any) {
+      console.error("Failed to fetch theme preview:", err);
+      set({
+        isLoadingThemePreview: false,
+        themeInstallError:
+          typeof err === "string"
+            ? err
+            : err?.message || `Failed to fetch theme "${themeId}" from registry`,
+      });
+    }
+  },
+
+  closeInstallThemeModal: () => {
+    set({
+      isInstallThemeModalOpen: false,
+      pendingTheme: null,
+      pendingThemeId: null,
+      isInstallingTheme: false,
+      isLoadingThemePreview: false,
+      themeInstallError: null,
+    });
+  },
+
+  confirmInstallTheme: async () => {
+    const { pendingTheme, pendingThemeId } = get();
+    const idToInstall = pendingTheme?.id || pendingThemeId;
+    if (!idToInstall) return;
+
+    set({ isInstallingTheme: true, themeInstallError: null });
+
+    try {
+      let installedTheme: Theme;
+      if (pendingTheme) {
+        installedTheme = await invoke<Theme>("save_theme", { theme: pendingTheme });
+      } else {
+        installedTheme = await invoke<Theme>("install_theme", { id: idToInstall });
+      }
+
+      // Refresh themes list from disk
+      await get().fetchThemes();
+
+      // Apply & activate installed theme
+      await get().setActiveThemeId(installedTheme.id);
+
+      get().closeInstallThemeModal();
+    } catch (err: any) {
+      console.error("Failed to install theme:", err);
+      set({
+        isInstallingTheme: false,
+        themeInstallError:
+          typeof err === "string"
+            ? err
+            : err?.message || "Failed to install theme to disk",
+      });
+    }
+  },
 }));
+

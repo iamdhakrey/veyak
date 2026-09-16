@@ -1,5 +1,6 @@
 use std::sync::Arc;
 use tauri::{AppHandle, Emitter, Manager, Window};
+use tauri_plugin_deep_link::DeepLinkExt;
 use tauri_plugin_oauth::start;
 use url::Url;
 
@@ -60,10 +61,13 @@ async fn start_server(window: Window) -> Result<u16, String> {
 async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
     let parsed = match Url::parse(raw_url) {
         Ok(u) => u,
-        Err(_) => return,
+        Err(e) => {
+            log::warn!("Failed to parse deep link URL '{}': {}", raw_url, e);
+            return;
+        }
     };
 
-    log::info!("{}", parsed);
+    log::info!("Handling deep link: {}", parsed);
     if parsed.scheme() == "veyak" && parsed.domain() == Some("theme") && parsed.path() == "/install"
     {
         let mut theme_id = String::new();
@@ -75,12 +79,10 @@ async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
             }
         }
 
-        let app_dir = app.path().app_data_dir().expect("resolve app data dir");
-        let data_dir = veyak_db::init_data_dir(&app_dir).expect("initialize data directory");
-
-        let _ = db::themes::install_theme(&data_dir, &theme_id).await;
-
-        let _ = crate::db::app_state::set_active_theme(&data_dir, &theme_id);
+        if theme_id.is_empty() {
+            log::warn!("Theme install deep-link missing theme_id/id parameter: {}", raw_url);
+            return;
+        }
 
         // Unminimize & bring window to front
         if let Some(window) = app.get_webview_window("main") {
@@ -89,11 +91,15 @@ async fn handle_deep_link(app: &AppHandle, raw_url: &str) {
             let _ = window.set_focus();
         }
 
-        // Forward to frontend
+        // Pre-fetch theme preview from registry if possible
+        let theme_preview = crate::db::themes::fetch_theme_preview(&theme_id).await.ok();
+
+        // Forward to frontend for confirmation (DO NOT write to disk or apply yet)
         let _ = app.emit(
             "deep-link://theme-install",
             serde_json::json!({
                 "id": theme_id,
+                "theme": theme_preview,
             }),
         );
     }
@@ -146,6 +152,17 @@ pub fn run() {
             if let Some(window) = app_handle.get_webview_window("main") {
                 let _ = window.set_decorations(true);
             }
+
+            let app_handle_deep = app_handle.clone();
+            let _ = app.deep_link().on_open_url(move |event| {
+                for url in event.urls() {
+                    let app_handle = app_handle_deep.clone();
+                    let url_str = url.to_string();
+                    tauri::async_runtime::spawn(async move {
+                        handle_deep_link(&app_handle, &url_str).await;
+                    });
+                }
+            });
 
             Ok(())
         })
@@ -231,7 +248,11 @@ pub fn run() {
             settings::list_themes,
             settings::delete_theme,
             settings::set_active_theme,
+            settings::fetch_theme_preview,
+            settings::install_theme,
+            settings::save_theme,
         ])
         .run(tauri::generate_context!())
         .expect("error while running Veyak application");
 }
+

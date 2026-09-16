@@ -493,7 +493,7 @@ impl Default for AppSettings {
 /// frontend applies a theme by writing these as CSS custom properties
 /// on `:root` at runtime (see commands/themes.rs doc comment).
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
 pub struct ThemeUI {
     pub color_bg: String,
@@ -523,6 +523,38 @@ pub struct ThemeUI {
     pub radius_lg: String,
 }
 
+impl Default for ThemeUI {
+    fn default() -> Self {
+        Self {
+            color_bg: "#0D1117".to_string(),
+            color_panel: "#161B22".to_string(),
+            color_panel_raised: "#1C2129".to_string(),
+            color_border: "#30363D".to_string(),
+            color_border_muted: "#21262D".to_string(),
+            color_text_primary: "#F0F6FC".to_string(),
+            color_text_secondary: "#9198A1".to_string(),
+            color_text_muted: "#656C76".to_string(),
+            color_primary: "#8B5CF6".to_string(),
+            color_primary_hover: "#9D74F8".to_string(),
+            color_secondary: "#3B82F6".to_string(),
+            color_success: "#10B981".to_string(),
+            color_error: "#EF4444".to_string(),
+            color_warning: "#F59E0B".to_string(),
+            method_get: "#2EA043".to_string(),
+            method_post: "#388BFD".to_string(),
+            method_put: "#F7681D".to_string(),
+            method_delete: "#FF445E".to_string(),
+            method_patch: "#FFB833".to_string(),
+            method_query: "#9D74F8".to_string(),
+            method_ws: "#792DFF".to_string(),
+            method_grpc: "#9D74F8".to_string(),
+            method_graphql: "#E30372".to_string(),
+            radius_md: "8px".to_string(),
+            radius_lg: "10px".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
@@ -531,8 +563,14 @@ pub enum ThemeVariant {
     Light,
 }
 
+impl Default for ThemeVariant {
+    fn default() -> Self {
+        Self::Dark
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
 pub struct ThemeSyntax {
     pub comment: String,
@@ -550,17 +588,51 @@ pub struct ThemeSyntax {
     pub operator: String,
 }
 
+impl Default for ThemeSyntax {
+    fn default() -> Self {
+        Self {
+            comment: "#8B949E".to_string(),
+            property: "#79C0FF".to_string(),
+            string: "#7EE787".to_string(),
+            number: "#D2A8FF".to_string(),
+            null: "#FFAB70".to_string(),
+            function: "#FFAB70".to_string(),
+            variable: "#FFAB70".to_string(),
+            attribute: "#FFAB70".to_string(),
+            class_name: "#FFAB70".to_string(),
+            boolean: "#FFAB70".to_string(),
+            keyword: "#FF7B72".to_string(),
+            punctuation: "#C9D1D9".to_string(),
+            operator: "#F2CC60".to_string(),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
-#[serde(rename_all = "camelCase")]
+#[serde(default, rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
 pub struct ThemeTokens {
     pub ui: ThemeUI,
     pub syntax: ThemeSyntax,
 }
 
+impl Default for ThemeTokens {
+    fn default() -> Self {
+        Self {
+            ui: ThemeUI::default(),
+            syntax: ThemeSyntax::default(),
+        }
+    }
+}
+
 pub fn default_schema() -> String {
     "https://veyak.iamdhakrey.dev/schemas/themes/1.0.0.json".to_string()
 }
+
+fn default_theme_version() -> String {
+    "1.0.0".to_string()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize, TS)]
 #[serde(rename_all = "camelCase")]
 #[ts(export, export_to = "models.ts")]
@@ -569,15 +641,43 @@ pub struct Theme {
     pub schema: String,
     pub id: String,
     pub name: String,
+    #[serde(default = "default_theme_version")]
     pub version: String,
+    #[serde(default)]
     pub description: String,
+    #[serde(default)]
     pub author: String,
+    #[serde(default)]
     pub repository: String,
+    #[serde(default)]
     pub license: String,
+    #[serde(default)]
     pub tags: Vec<String>,
+    #[serde(default)]
     pub variant: ThemeVariant,
+    #[serde(default)]
     pub is_builtin: bool,
+    #[serde(default)]
     pub tokens: ThemeTokens,
+}
+
+impl Default for Theme {
+    fn default() -> Self {
+        Self {
+            schema: default_schema(),
+            id: "custom-theme".to_string(),
+            name: "Custom Theme".to_string(),
+            version: "1.0.0".to_string(),
+            description: String::new(),
+            author: String::new(),
+            repository: String::new(),
+            license: "MIT".to_string(),
+            tags: Vec::new(),
+            variant: ThemeVariant::Dark,
+            is_builtin: false,
+            tokens: ThemeTokens::default(),
+        }
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -1029,3 +1129,57 @@ pub struct GraphQlSchema {
     pub subscription_type: Option<String>,
     pub types: Vec<GraphQlSchemaType>,
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_theme_partial_deserialization_json() {
+        let raw_json = r##"{
+            "id": "my-legacy-theme",
+            "name": "My Legacy Theme",
+            "tokens": {
+                "ui": {
+                    "colorBg": "#121212",
+                    "colorPrimary": "#FF00FF"
+                },
+                "syntax": {
+                    "keyword": "#FF0000"
+                }
+            }
+        }"##;
+
+        let theme: Theme = serde_json::from_str(raw_json).expect("should deserialize partial JSON theme");
+        assert_eq!(theme.id, "my-legacy-theme");
+        assert_eq!(theme.name, "My Legacy Theme");
+        assert_eq!(theme.tokens.ui.color_bg, "#121212");
+        assert_eq!(theme.tokens.ui.color_primary, "#FF00FF");
+        // Check default fallbacks for missing tokens
+        assert_eq!(theme.tokens.ui.color_panel, "#161B22");
+        assert_eq!(theme.tokens.ui.method_graphql, "#E30372");
+        assert_eq!(theme.tokens.syntax.keyword, "#FF0000");
+        assert_eq!(theme.tokens.syntax.comment, "#8B949E");
+        assert_eq!(theme.version, "1.0.0");
+        assert_eq!(theme.license, "");
+        assert_eq!(theme.is_builtin, false);
+    }
+
+    #[test]
+    fn test_theme_partial_deserialization_yaml() {
+        let raw_yaml = r##"
+id: minimal-yaml-theme
+name: Minimal YAML
+tokens:
+  ui:
+    colorBg: "#000000"
+"##;
+
+        let theme: Theme = serde_yaml::from_str(raw_yaml).expect("should deserialize partial YAML theme");
+        assert_eq!(theme.id, "minimal-yaml-theme");
+        assert_eq!(theme.tokens.ui.color_bg, "#000000");
+        assert_eq!(theme.tokens.ui.color_panel, "#161B22");
+        assert_eq!(theme.tokens.syntax.keyword, "#FF7B72");
+    }
+}
+
