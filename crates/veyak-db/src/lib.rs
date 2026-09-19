@@ -331,7 +331,7 @@ fn migrate_request_http_type(dd: &DataDir) {
                                 RequestItem::Http(old_req)
                             } else {
                                 // Unparseable file, skip
-                                return; // or `continue;` if inside a loop
+                                continue; // or `continue;` if inside a loop
                             };
 
                             // 4. Save back to disk if any migrations (WS or missing type tag) were applied.
